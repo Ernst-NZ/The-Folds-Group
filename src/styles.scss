@@ -1,1 +1,62 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; color: white; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; color: white; }
+
+.white {
+  color: white;
+}
+
+.hero-image {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url("./assets/ecommerce-Shop.jpg");
+//   background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url("./assets/ecommerce-card.jpg");
+//   background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url("./assets/ecommerce-PC.jpg");
+  height: 90%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+}
+
+.menuBanner3 {
+  margin-top: 1em;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  height: 20vw;
+  min-height: 12em;
+  border-radius: 10px;
+  a {
+    top: 40%;
+    position: relative;
+    font-size: large;
+    width: 80%;
+    margin: auto;
+  }
+}
+
+.menuBanner2 {
+  margin-top: 1em;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  height: 25vw;
+  min-height: 6em;
+}
+
+
+.menuBanner3:hover {
+  opacity: 0.8;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+  background-color: black;
+  border: white solid 1px;
+}
+
+.myButtons {
+  position: inherit;
+  border: 2px solid #082943;
+  padding-left: 1px;
+  padding-right: 1px;
+}

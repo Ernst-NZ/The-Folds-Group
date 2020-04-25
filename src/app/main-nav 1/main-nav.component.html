@@ -1,0 +1,115 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport="false"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" [opened]='false'>
+    <mat-toolbar color="primary">Menu</mat-toolbar>
+    <mat-nav-list>
+      <div class="btn-group-vertical" style='width: 95%;'>
+        <button mat-button class="sideButton" routerLink="/viewHS/0" (click)="drawer.toggle()">H & S Document</button>
+        <button mat-button class="sideButton" routerLink="/hsConsole/0" (click)="drawer.toggle()">H & S Console</button>
+        <button mat-button class="sideButton" routerLink="/meetingConsole" (click)="drawer.toggle()">H & S
+          Meetings</button>
+        <!-- <button mat-button [matMenuTriggerFor]="sop" class="sideButton">Check Lists</button>
+        <mat-menu #sop="matMenu" class="sideMenu">
+          <div *ngIf='CheckText'>
+            <div *ngFor="let item of CheckText; let i = index">
+              <button mat-menu-item routerLink="/checkFill/{{ item }}" class='sideAdmin'
+                (click)="drawer.toggle()">{{ item }}</button>
+            </div>
+          </div>
+        </mat-menu> -->
+        <button mat-button class="sideButton" routerLink="/incidentReport" (click)="drawer.toggle()">Incident
+          Report</button>
+        <button mat-button class="sideButton" routerLink="/hazardReport" (click)="drawer.toggle()">Hazard
+          Report</button>
+        <!-- <button mat-button [matMenuTriggerFor]="checkList" class="sideButton">SOP's</button>
+        <mat-menu #checkList="matMenu" class="sideMenu" style="background-color: darkblue;">
+          <div *ngIf='CheckText'>
+            <div *ngFor="let item of SOPText; let i = index">
+              <button mat-menu-item routerLink="/viewOther/{{ item.headerId }}" class='sideAdmin'
+                (click)="drawer.toggle()">{{ item.headerDescription }}</button>
+            </div>
+          </div>
+        </mat-menu> -->
+        <button mat-button class="sideButton" routerLink="/personalConsole" (click)="drawer.toggle()">H&S Admin</button>
+        <button mat-button class="sideButton" routerLink="/change-password/0" (click)="drawer.toggle()">Change
+          Password</button>
+        <br>
+        <div
+          *ngIf="globals.userRole && globals.userRole.toString() === 'SystemAdmin' || globals.userRole && globals.userRole.toString() === 'SiteAdmin'">
+          <span class="btn-block sideButton" style='font-size: 0.75em;'>-ADMIN-</span>
+          <button
+            *ngIf="globals.userRole && globals.userRole.toString() === 'SystemAdmin' || globals.userRole && globals.userRole.toString() === 'SiteAdmin'"
+            mat-button class="sideButton" routerLink="/companyConsole" (click)="drawer.toggle()">Company Admin</button>
+          <!-- <button *ngIf="globals.userRole && globals.userRole.toString() === 'SystemAdmin'" mat-button
+            [matMenuTriggerFor]="SATS" class="sideButton">SATS Admin</button>
+          <mat-menu #SATS="matMenu" class="sideMenu">
+            <button mat-menu-item routerLink="/userdetails" class='btn btn-sm sideAdmin' (click)="drawer.toggle()">SATS
+              Admin &raquo;</button>
+            <button mat-menu-item routerLink="/signup" class='btn btn-sm sideAdmin' (click)="drawer.toggle()">Add New
+              User &raquo;</button>
+          </mat-menu> -->
+        </div>
+        <span class="btn-block sideButton" style='font-size: 0.75em' (click)="drawer.toggle()"> {{globals.users}}<br>Expiry date {{globals.lastDate | date: 'dd-MM-yy'}}</span>
+        <span class="btn-block sideButton" style='font-size: 0.75em' (click)="drawer.toggle()"> SATS B2/1/15</span>
+      </div>
+
+
+    </mat-nav-list>
+  </mat-sidenav>
+
+
+  <!-- ################### - Top - ###################### -->
+
+  <mat-sidenav-content class="mainBackGround">
+    <mat-toolbar  class="doNotPrint" color="primary" [ngClass]="globals.companyCode">
+      <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()"
+        *ngIf="(this.globals.userCode)">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <a routerLink="/menu"><span class='myLink'>Home</span></a>
+      <div *ngIf="(globals.userCode) && !(isHandset$ | async)" class="mh-90" id="compImg"></div>
+      <div *ngIf="!(globals.userCode)">
+        <label *ngIf="!(isHandset$ | async)" style='margin-bottom: 0;'>NZ Safety and Training Solutions</label>
+        <label *ngIf="(isHandset$ | async)" style='margin-bottom: 0;'>NZ SATS</label>
+      </div>
+      <div *ngIf="this.globals.userCode">
+        <label *ngIf="!(isHandset$ | async)"
+          style='font-style: italic; margin-bottom: 0;'>{{globals.companyName}}</label>
+      </div>
+
+      <span class="spacer"></span>
+      <a *ngIf="!(isHandset$ | async) && !globals.loginUser" routerLink="/menu"><span class='myLink'>Pricing</span></a>
+      <a *ngIf="!(isHandset$ | async) && !globals.loginUser" routerLink="/aboutUs"><span class='myLink'>About
+          us</span></a>
+
+      <div *ngIf="(isHandset$ | async) && globals.loginUser" style="font-size: 1em; ">
+        <a *ngIf="globals.userRole && globals.userRole.toString() === 'SystemAdmin' || globals.userRole && globals.userRole.toString() === 'SiteAdmin'"
+          routerLink="/companyConsole"><span class='myLink'>H&S Admin</span></a>
+
+        <a *ngIf="globals.userRole && globals.userRole.toString() === 'SiteUser'" routerLink="/personalConsole"><span
+            class='myLink'>H&S Admin</span></a>
+      </div>
+
+      <div *ngIf="!(isHandset$ | async) && globals.loginUser">
+        <a *ngIf="globals.userRole && globals.userRole.toString() === 'SystemAdmin' || globals.userRole && globals.userRole.toString() === 'SiteAdmin'"
+          routerLink="/companyConsole"><span class='myLink'>H&S Admin</span></a>
+
+        <a *ngIf="globals.userRole && globals.userRole.toString() === 'SiteUser'" routerLink="/personalConsole"><span
+            class='myLink'>H&S Admin</span></a>
+
+      </div>
+
+
+      <a *ngIf="!(isHandset$ | async) && !globals.loginUser" routerLink="/contactUs"><span class='myLink'>Contact
+          us</span></a>
+      <button *ngIf="!(this.globals.userCode)" class="btn btn-outline-light" routerLink="/login">Login</button>
+      <button *ngIf="this.globals.userCode" class="btn btn-outline-light bt-sm "
+        (click)="Logout()">{{ this.globals.userName }}</button>
+    </mat-toolbar>
+    <div class="content">
+      <ng-content></ng-content>
+    </div>
+    <br>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>
