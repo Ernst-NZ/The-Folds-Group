@@ -1,6 +1,6 @@
 <div class='container'>
   <div class='row'>
-    <div class="col-12 col-md-4 " style="text-align: center; top: 50%">
+    <div class="col-12 col-md-4 ">
       <!-- <a routerLink="/viewCheckList">
         <div class="menuBanner3"
           style='background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url("../../assets/ecommerce-2.jpg");'>
@@ -14,6 +14,7 @@
         <div class="menuBanner3">
           <a class="btn btn-light btn-block myButtons" >Download Orders &raquo;
           </a>
+          <p class="btn btn-light btn-block myButtons" *ngIf='totalOrders'>{{ totalOrders }}</p>
         </div>
       </a>
     </div>
@@ -29,7 +30,7 @@
     <div class="col-sm-6" style="text-align: center">
       <a (click)="getOrders3()">
         <div class="menuBanner3">
-          <a class="btn btn-light btn-block myButtons">Get Total &raquo;
+          <a class="btn btn-light btn-block myButtons">Order Maintenance &raquo;
           </a>
         </div>
       </a>

@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class ShopifyService {
+export class VendService {
   reqHeader: any;
   editHeader: any;
   testHeader: any;
@@ -28,24 +28,20 @@ export class ShopifyService {
     return this.http.get<any[]>(this.rootURL + '/Users/SPGetUsers');
   }
 
-  getorders(): Observable<any[]> {
+  gettest(): Observable<any[]> {
     console.log(2);
     return this.http.get<any[]>(
      'https://9090c9c4613998cb4e061f4255c95827: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@holdstest.myshopify.com/admin/orders.json?limit=250'
       );
   }
 
-  getorders2(): Observable<any[]> {
-    console.log('Orders 2',  2);
-    return this.http.get<any>(
-     'https://750d4800b3a3c941d29823e4c00de88c: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@holdstest.myshopify.com/admin/api/2020-04/orders.json'
-      );
+  vendTest(): Observable<any> {
+    const accessToken = '4DbmXm5QdMr12HuLpDhOl_dLhdnn6gIRvW0Z1Y8f';
+    const reqHeader2 = new HttpHeaders({ Authorization: 'Bearer ' + accessToken });
+    return this.http.post('https://foldtest.vendhq.com/api/2.0/retailer', {
+      headers: reqHeader2
+    });
   }
-  getorders3(): Observable<any[]> {
-    console.log('Orders 2',  2);
-    return this.http.get<any>(
-     `https://750d4800b3a3c941d29823e4c00de88c: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@
-     holdstest.myshopify.com/admin/api/2020-04/orders/count.json?since_id=123`
-      );
-  }
+
+
 }

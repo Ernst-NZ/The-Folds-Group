@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
+import { Globals } from 'src/app/globals';
 
 @Component({
   selector: 'app-footer',
@@ -16,7 +17,8 @@ export class FooterComponent implements OnInit {
   currentYear: number;
 
   constructor(
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    public globals: Globals
   ) { }
 
   ngOnInit(): void {

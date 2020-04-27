@@ -1,0 +1,72 @@
+<div class='container'>
+  <br>
+  <br>
+  <br>
+  <div class="container card" style='max-width: 400px;'>
+    <br>
+    <div style="text-align: center;">
+      <h2>Login to The Folds Group Dashbord</h2>
+    </div>
+    <br>
+    <div>
+      <div *ngIf="isLoginError" class="fontRed center error-message" style="margin-top: -35px; margin-bottom: 10px;">
+        <i class="material-icons">error</i> Incorrect username or password
+      </div>
+      <form #loginForm="ngForm" class="col s12" (ngSubmit)="OnSubmit(UserName.value,Password.value)"
+        style='max-width: 600px; margin: auto'>
+        <div class="row">
+          <div *ngIf="!(isHandset$ | async)" class="input-field col-1 right">
+            <i class="material-icons prefix">account_circle</i>
+          </div>
+          <div class="input-field col-sm-11">
+            <label>Username: </label>
+            <input type="text" #UserName ngModel name="UserName" placeholder="Username" required>
+          </div>
+        </div>
+        <div class="row">
+          <div *ngIf="!(isHandset$ | async)" class="input-field col-1 right">
+            <i class="material-icons prefix">vpn_key</i>
+          </div>
+          <div class="input-field col-sm-11">
+            <label>Password: </label>
+            <input type="password" #Password ngModel name="Password" placeholder="Password" required>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col-12" style="text-align: center;">
+            <button [disabled]="!loginForm.valid" class="btn btn-sm btn-success btn-submit" type="submit"
+              style='max-width: 120px; text-align: center'>{{this.btnText}}</button><br><br>
+          </div>
+        </div>
+      </form>
+    </div>
+    <br>
+    <br>
+    <br>
+  </div>
+</div>
+
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-basic-title">Forget Password</h3>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body appBackGround">
+    <span><u>Please enter your email address below</u></span>
+    <input type="text" [(ngModel)]="userEmail" class="form-control"
+    style="height: 2.25em; margin-bottom: 0px; border-radius: 5px;" />
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger btn-outline-dark" (click)="modal.close('Save click')">{{ btnReset }}</button>
+  </div>
+</ng-template>
+
+
+<ngx-spinner bdOpacity=0.9 bdColor="" size="medium" color="#f30808" type="ball-running-dots" fullScreen="false">
+  <p style="color: white"> Loading... </p>
+</ngx-spinner>
+<p [hidden]="!this.syncing" style="text-align: center; font-size: 2em; color: red;">Loading...</p>

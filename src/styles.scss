@@ -34,6 +34,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; color: whit
     width: 80%;
     margin: auto;
   }
+  p {top: 40%;
+    position: relative;
+    width: 20%;
+    margin: auto;}
 }
 
 .menuBanner2 {
@@ -59,4 +63,151 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; color: whit
   border: 2px solid #082943;
   padding-left: 1px;
   padding-right: 1px;
+}
+
+// Look and Feel
+.left {
+  text-align: left;
+}
+
+.right {
+  text-align: right;
+}
+
+.fright {
+  float: right;
+}
+
+.center {
+  text-align: center;
+}
+
+ul.b {
+  list-style-type: square;
+}
+
+div.validation-error {
+  width: 100%;
+  margin-top: .25rem;
+  font-size: 80%;
+  color: #dc3545;
+}
+
+//Colors
+.appBackGround {
+  background-color: #dfecf7;
+}
+
+.backBlue {
+  background-color: #082943;
+}
+
+.whiteBorder {
+  border: solid 1px white;
+}
+
+.redBorder {
+  border: solid 1px red;
+}
+
+.borderRed2 {
+  border: solid 3px red;
+}
+
+.blueBorder {
+  border: solid 1px #082943;
+}
+
+.yellowBorder {
+  border: solid 1px yellow;
+}
+
+.backPink {
+  background-color: lightpink;
+}
+
+.backKhaki {
+  background-color: khaki;
+}
+
+.backSalmon {
+  background-color: lightsalmon;
+}
+
+.backYellow {
+  background-color: lightyellow;
+}
+
+//Font
+.fontWhite {
+  color: white;
+}
+
+.fontBlack {
+  color: black;
+}
+
+.fontRed {
+  color: red;
+}
+
+.fontMaroon {
+  color: maroon;
+}
+
+.fontYellow {
+  color: yellow;
+}
+
+.fontLime {
+  color: lime;
+}
+
+.fontDarkGreen {
+  color: darkgreen;
+}
+
+.fontDarkOrange {
+  color: darkorange;
+}
+
+.fontOrange {
+  color: orange;
+}
+
+.fontCrimson {
+  color: crimson;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.fontSize05 {
+  font-size: 0.5em;
+}
+
+.fontSize075 {
+  font-size: 0.75em;
+}
+
+.fontSize15 {
+  font-size: 1.5em;
+}
+
+.fontSize2 {
+  font-size: 2em;
+}
+
+.fontSize25 {
+  font-size: 2.5em;
+}
+
+.footAll {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 30px;
+  text-align: center;
 }

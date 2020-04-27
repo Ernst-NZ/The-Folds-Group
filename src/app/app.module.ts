@@ -9,8 +9,10 @@ import { JwtInterceptor } from 'src/app/_helpers/jwt.interceptor';
 import { ErrorInterceptor } from 'src/app/_helpers/error.interceptor';
 import { AuthGuard } from './_auth/auth.guard';
 import { AuthInterceptor } from './_auth/auth.intercepter';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { ToastrModule } from 'ngx-toastr';
 
-
+import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -28,6 +30,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FooterComponent } from './footer/footer.component';
 import { MenuComponent } from './menu/menu.component';
 import { AuthComponent } from './auth/auth.component';
+import { OrderListComponent } from './order-list/order-list.component';
+import { SignInComponent } from './sign-in/sign-in.component';
 
 @NgModule({
   declarations: [
@@ -35,12 +39,16 @@ import { AuthComponent } from './auth/auth.component';
     MainNavComponent,
     FooterComponent,
     MenuComponent,
-    AuthComponent
+    AuthComponent,
+    OrderListComponent,
+    SignInComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    NgxSpinnerModule,
+    FormsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     HttpClientModule,
     LayoutModule,
@@ -51,6 +59,7 @@ import { AuthComponent } from './auth/auth.component';
     MatIconModule,
     MatListModule,
     MatMenuModule,
+    ToastrModule.forRoot(),
   ],
   providers: [
     UserService,
