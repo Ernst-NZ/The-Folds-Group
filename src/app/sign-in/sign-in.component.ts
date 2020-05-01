@@ -47,20 +47,24 @@ export class SignInComponent implements OnInit {
   OnSubmit(userName, password) {
     /** spinner starts on init */
     this.btnText = 'Processing';
-
-
-
     this.syncing = true;
     this.spinner.show();
+    console.log('start');
     this.userService.userAuthentication(userName, password).subscribe((data: any) => {
-          localStorage.setItem('userToken', data.access_token);
-          localStorage.setItem('userCode', userName);
-          this.globals.userCode = userName;
-          this.syncing = false;
-          this.userService.setUser();
-          this.spinner.hide();
-          this.btnText = 'Login';
-          this.router.navigate(['/menu']);
+      console.log(data);
+      this.globals.loginUser = true;
+      localStorage.setItem('userToken', data.access_token);
+      localStorage.setItem('userCode', userName);
+      this.globals.userCode = userName;
+      this.userService.SPGetUserInfo(userName).subscribe((info: any) => {
+        console.log(info);
+        localStorage.setItem('firstName', info[0].FirstName);
+        this.globals.FirstName = info[0].FirstName;
+      });
+      this.syncing = false;
+      this.spinner.hide();
+      this.btnText = 'Login';
+      this.router.navigate(['/menu']);
         },
         (err: HttpErrorResponse) => {
           console.log('Authentication Error', err);

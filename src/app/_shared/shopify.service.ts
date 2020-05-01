@@ -24,28 +24,23 @@ export class ShopifyService {
     this.editHeader = new HttpHeaders({ 'No-Auth': 'True' });
  }
 
- getASPUsers(): Observable<any[]> {
-    return this.http.get<any[]>(this.rootURL + '/Users/SPGetUsers');
+  getTotal(): Observable<any> {
+    console.log('Get Total Service');
+    return this.http.get<any>(this.rootURL + '/ShopifyTotal/');
   }
 
-  getorders(): Observable<any[]> {
+  getTest(endPoint: string): Observable<any> {
     console.log(2);
-    return this.http.get<any[]>(
-     'https://9090c9c4613998cb4e061f4255c95827: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@holdstest.myshopify.com/admin/orders.json?limit=250'
-      );
+    return this.http.get<any>(this.rootURL + '/shopOrders/');
   }
 
-  getorders2(): Observable<any[]> {
-    console.log('Orders 2',  2);
-    return this.http.get<any>(
-     'https://750d4800b3a3c941d29823e4c00de88c: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@holdstest.myshopify.com/admin/api/2020-04/orders.json'
-      );
+  getorders(endPoint: string): Observable<any> {
+    console.log('Get Total Service');
+    return this.http.get<any>(this.rootURL + '/ShopifyGetOrder/');
   }
-  getorders3(): Observable<any[]> {
-    console.log('Orders 2',  2);
-    return this.http.get<any>(
-     `https://750d4800b3a3c941d29823e4c00de88c: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@
-     holdstest.myshopify.com/admin/api/2020-04/orders/count.json?since_id=123`
-      );
+
+  SPGetOrders(): Observable<any> {
+    console.log('Get Total Service');
+    return this.http.get<any>(this.rootURL + '/SPGetOrders/');
   }
 }

@@ -11,6 +11,9 @@ import { AuthGuard } from './_auth/auth.guard';
 import { AuthInterceptor } from './_auth/auth.intercepter';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { SorterService } from '../app/_shared/sorter.service';
 
 import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
@@ -32,6 +35,11 @@ import { MenuComponent } from './menu/menu.component';
 import { AuthComponent } from './auth/auth.component';
 import { OrderListComponent } from './order-list/order-list.component';
 import { SignInComponent } from './sign-in/sign-in.component';
+import { SignUpComponent } from './sign-up/sign-up.component';
+import { MenuBlankComponent } from './menu/menu-blank/menu-blank.component';
+import { MenuAuthComponent } from './menu/menu-auth/menu-auth.component';
+import { OrderMenuComponent } from './order-menu/order-menu.component';
+import { MyTestComponent } from './my-test/my-test.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +49,12 @@ import { SignInComponent } from './sign-in/sign-in.component';
     MenuComponent,
     AuthComponent,
     OrderListComponent,
-    SignInComponent
+    SignInComponent,
+    SignUpComponent,
+    MenuBlankComponent,
+    MenuAuthComponent,
+    OrderMenuComponent,
+    MyTestComponent
   ],
   imports: [
     BrowserModule,
@@ -59,12 +72,16 @@ import { SignInComponent } from './sign-in/sign-in.component';
     MatIconModule,
     MatListModule,
     MatMenuModule,
-    ToastrModule.forRoot(),
+    MatDatepickerModule,
+    NgbModule,
+    NgxSpinnerModule,
+    ToastrModule.forRoot({ timeOut: 9000, enableHtml: true, toastClass: 'toast toast-bootstrap-compatibility-fix' }),
   ],
   providers: [
     UserService,
     AuthGuard,
     Globals,
+    SorterService,
     AuthenticationService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },

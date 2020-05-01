@@ -16,6 +16,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; color: whit
   background-repeat: no-repeat;
   background-size: cover;
   position: relative;
+  color: white;
 }
 
 .menuBanner3 {
@@ -39,6 +40,30 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; color: whit
     width: 20%;
     margin: auto;}
 }
+
+.menuBanner {
+  margin-top: 1em;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  height: 20vw;
+  min-height: 12em;
+  border-radius: 10px;
+  a {
+    top: 40%;
+    position: relative;
+    font-size: large;
+    width: 80%;
+    margin: auto;
+  }
+  p {top: 40%;
+    position: relative;
+    width: 20%;
+    margin: auto;}
+}
+
+
 
 .menuBanner2 {
   margin-top: 1em;
@@ -65,6 +90,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; color: whit
   padding-right: 1px;
 }
 
+.toast-bootstrap-compatibility-fix {
+  opacity:1;
+}
 // Look and Feel
 .left {
   text-align: left;
@@ -92,6 +120,30 @@ div.validation-error {
   font-size: 80%;
   color: #dc3545;
 }
+
+[type="checkbox"]+label:before,
+[type="checkbox"]:not(.filled-in)+label:after {
+  border: 2px solid red;
+}
+
+#container {
+  div.error-message i {
+    vertical-align: middle !important;
+  }
+
+  input.ng-invalid.ng-dirty {
+    border-bottom-color: red !important;
+    box-shadow: 0 1px 0 0 red !important;
+  }
+}
+.custom-control-label::before,
+.custom-control-label::after {
+  top: -1.75rem;
+  width: 2.75rem;
+  height: 2.00rem;
+  border-radius: 10px;
+}
+
 
 //Colors
 .appBackGround {
@@ -210,4 +262,8 @@ div.validation-error {
   /* Set the fixed height of the footer here */
   height: 30px;
   text-align: center;
+}
+
+#pageFooter {
+  border-top: black solid 2px;
 }

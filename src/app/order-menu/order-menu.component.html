@@ -1,0 +1,136 @@
+<div class='container' *ngIf="this.filteredText">
+  <div class='row' style='text-align: center; margin: auto;'>
+    <div class='col-12' style='text-align: center;'>
+      <h2><u>The Fold Group Orders</u></h2>
+    </div>
+  </div>
+
+  <div class='row' style='padding-top: 5px; background-color: darkgrey; margin-left: 10px; margin-right: 10px;'>
+    <div class='col-sm-6'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        From Date:
+      </label>
+      <div class="input-group">
+        <input class="form-control" placeholder="dd-mm-yyyy" name="dp" [(ngModel)]="dateFrom" ngbDatepicker
+          #dp="ngbDatepicker" (change)="preFilter()">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" (click)="preDate(); dp.toggle() " type="button"
+            style='padding-top: 0px; padding-bottom: 0px;'>
+            <i class="material-icons">
+              date_range
+            </i></button>
+        </div>
+      </div>
+    </div>
+    <div class='col-sm-6'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        To Date:
+      </label>
+      <div class="input-group">
+        <input class="form-control" placeholder="dd-mm-yyyy" name="dpTo" [(ngModel)]="dateTo" ngbDatepicker
+          #dpTo="ngbDatepicker" (change)="preDate()">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" (click)="dpTo.toggle(); preDate()" type="button">📅</button>
+
+
+        </div>
+      </div>
+    </div>
+    <div class='col-sm-4'>
+
+    </div>
+  </div>
+
+  <div class='row' style='padding-top: 5px; background-color: darkgrey; margin-left: 10px; margin-right: 10px;'>
+    <div class='col-sm-3 right'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        Only Outstanding:
+      </label>
+    </div>
+    <div class='col-sm-1'>
+      <div class="custom-control form-control-lg custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="Outstanding" name="Outstanding" #Outstanding="ngModel"
+          [(ngModel)]="outstanding" (change)='preFilter()'>
+        <label class="custom-control-label" for="outstanding"></label>
+      </div>
+    </div>
+    <div class='col-sm-4'>
+      <input placeholder="Search ..." [value]="searchText" (keyup)="filter($event.target.value)">
+
+    </div>
+    <div class='col-sm-4'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        Clear All Filters:
+      </label>
+      <button type="button" class="btn btn-sm btn-info" (click)="resetFilters()">Clear All Filters</button>
+    </div>
+  </div>
+
+  <div class='card' style='margin: auto;'>
+    <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 1em;'
+      *ngIf='filteredText'>
+      <thead class="table-primary">
+        <tr>
+          <th (click)="sort('OrderNumber')">Order ({{filteredText.length}})</th>
+          <th (click)="sort('OrderDate')">Date</th>
+          <th (click)="sort('OrderCustomer')">Customer</th>
+          <th (click)="sort('OrderPayment')" *ngIf="!(isHandset$ | async)">Payment</th>
+          <th (click)="sort('FoldStatus')" *ngIf="!(isHandset$ | async)">Status</th>
+          <th (click)="sort('OrderItemTotal')">Item Total</th>
+          <th (click)="sort('OrderTotal')" *ngIf="!(isHandset$ | async)">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pak of this.filteredText; let i = index" [attr.data-index]="i"
+          [ngClass]="(pak.FoldStatus)?'fontBlack':'fontRed'">
+          <td>
+            <button *ngIf='pak.FoldStatus === "Fulfilled"' class="btn btn-success btn-large btn-block" (click)="getOrder(pak.OrderId)"
+              style='text-align: left;'>#{{ pak.OrderNumber }}</button>
+            <button *ngIf='!pak.FoldStatus' class="btn btn-danger btn-large btn-block" (click)="getOrder(pak.OrderId)"
+              style='text-align: left;'>#{{ pak.OrderNumber }}</button>
+          </td>
+          <td>
+            {{ pak.OrderDate}}
+          </td>
+          <td>
+            {{ pak.OrderCustomer}}
+          </td>
+          <td *ngIf="!(isHandset$ | async)">
+            {{ pak.OrderPayment}}
+          </td>
+          <td *ngIf="!(isHandset$ | async)">
+            {{ pak.FoldStatus}}
+          </td>
+          <td>
+            {{ pak.OrderItemTotal}}
+          </td>
+          <td *ngIf="!(isHandset$ | async)">
+            {{ pak.OrderTotal}}
+          </td>
+        </tr>
+        <tr *ngIf="filteredText.length === 0">
+          <td colspan='6'>
+            <span>No Information Available</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<ng-template #log let-modal>
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-basic-title">Log Comments</h3>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body appBackGround">
+    <label [innerHTML]="" style="width:95%; opacity: 0.8; font-size: 1em"></label>
+
+  </div>
+</ng-template>
+
+<ngx-spinner bdOpacity=0.9 bdColor="" size="medium" color="#f30808" type="ball-running-dots" fullScreen="false">
+  <p style="color: red"> Loading... </p>
+</ngx-spinner>

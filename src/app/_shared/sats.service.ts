@@ -79,9 +79,6 @@ export class SatsService {
     );
   }
 
-  getUserDetailsFull(userCode: string) {
-    return this.http.get(this.rootURL + '/SPGetUserFull/' + userCode);
-  }
 
   SPGetUserAccessUser(userCode: string) {
     return this.http.get(this.rootURL + '/SPGetUserAccessUser/' + userCode);

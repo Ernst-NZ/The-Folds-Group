@@ -1,0 +1,33 @@
+<p>my-test works!</p>
+<div style="background-color: blanchedalmond;">
+<p>Inline datepicker Example</p>
+
+<ngb-datepicker #dp [(ngModel)]="model" (navigate)="date = $event.next"></ngb-datepicker>
+
+<input type="text" ngbDatepicker #d="ngbDatepicker"/>
+
+<hr/>
+
+<button class="btn btn-sm btn-outline-primary mr-2" (click)="selectToday()">Select Today</button>
+<button class="btn btn-sm btn-outline-primary mr-2" (click)="dp.navigateTo()">To current month</button>
+<button class="btn btn-sm btn-outline-primary mr-2" (click)="dp.navigateTo({year: 2013, month: 2})">To Feb 2013</button>
+
+<hr/>
+
+<pre>Month: {{ date.month }}.{{ date.year }}</pre>
+<pre>Model: {{ model | json }}</pre>
+ <br><br><br><br><br>
+
+<div class="input-group">
+
+  <input class="form-control" placeholder="yyyy-mm-dd" name="dp" [(ngModel)]="model" ngbDatepicker #d="ngbDatepicker">
+
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary calendar" (click)="d.toggle(); test()" type="button">📅</button>
+  </div>
+
+</div>
+<hr />
+<code>Model: {{ model | json }}</code>
+
+</div>
