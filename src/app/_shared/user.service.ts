@@ -39,7 +39,7 @@ export class UserService {
       'Content-Type': 'application/x-www-urlencoded',
       'No-Auth': 'True'
     });
-    console.log(data, reqHeader)
+    console.log(this.rootURL, data, reqHeader)
     return this.http.post(this.rootURL + '/token', data, {
       headers: reqHeader
     });
