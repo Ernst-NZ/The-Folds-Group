@@ -51,7 +51,7 @@ export class SignInComponent implements OnInit {
     this.spinner.show();
     console.log('start');
     this.userService.userAuthentication(userName, password).subscribe((data: any) => {
-      console.log(data);
+      console.log('login data', data);
       this.globals.loginUser = true;
       localStorage.setItem('userToken', data.access_token);
       localStorage.setItem('userCode', userName);

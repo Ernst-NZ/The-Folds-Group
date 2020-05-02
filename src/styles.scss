@@ -138,10 +138,11 @@ div.validation-error {
 }
 .custom-control-label::before,
 .custom-control-label::after {
-  top: -1.75rem;
+//  top: 1.75rem;
   width: 2.75rem;
   height: 2.00rem;
   border-radius: 10px;
+  vertical-align: middle;
 }
 
 

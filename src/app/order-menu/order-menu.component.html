@@ -6,66 +6,47 @@
   </div>
 
   <div class='row' style='padding-top: 5px; background-color: darkgrey; margin-left: 10px; margin-right: 10px;'>
-    <div class='col-sm-6'>
+    <div class='col-sm-3'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        Search:
+      </label><br>
+      <input placeholder="Search ..." [value]="searchText" (keyup)="filter($event.target.value)" style="height: 2.5em; width: 100%; border-radius: 5px; vertical-align: middle; padding-left: 5px;">
+    </div>
+    <div class='col-sm-3'>
       <label class='bu' style='margin-bottom: 0px;'>
         From Date:
       </label>
       <div class="input-group">
-        <input class="form-control" placeholder="dd-mm-yyyy" name="dp" [(ngModel)]="dateFrom" ngbDatepicker
-          #dp="ngbDatepicker" (change)="preFilter()">
+        <input class="form-control" placeholder="dd-mm-yyyy" name="dpFrom" [(ngModel)]="dateFrom" ngbDatepicker
+          #dpFrom="ngbDatepicker" (closed)="preFilter()">
         <div class="input-group-append">
-          <button class="btn btn-outline-secondary" (click)="preDate(); dp.toggle() " type="button"
-            style='padding-top: 0px; padding-bottom: 0px;'>
-            <i class="material-icons">
-              date_range
-            </i></button>
+          <button class="btn btn-outline-secondary" (click)="dpFrom.toggle(); preDate()" type="button">📅</button>
         </div>
       </div>
     </div>
-    <div class='col-sm-6'>
+    <div class='col-sm-3'>
       <label class='bu' style='margin-bottom: 0px;'>
         To Date:
       </label>
       <div class="input-group">
         <input class="form-control" placeholder="dd-mm-yyyy" name="dpTo" [(ngModel)]="dateTo" ngbDatepicker
-          #dpTo="ngbDatepicker" (change)="preDate()">
+          #dpTo="ngbDatepicker" (closed)="preFilter()">
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" (click)="dpTo.toggle(); preDate()" type="button">📅</button>
-
-
         </div>
       </div>
     </div>
-    <div class='col-sm-4'>
-
-    </div>
-  </div>
-
-  <div class='row' style='padding-top: 5px; background-color: darkgrey; margin-left: 10px; margin-right: 10px;'>
-    <div class='col-sm-3 right'>
+    <div class='col-sm-3 center'>
       <label class='bu' style='margin-bottom: 0px;'>
-        Only Outstanding:
+        Un-fulfilled Only:
       </label>
-    </div>
-    <div class='col-sm-1'>
-      <div class="custom-control form-control-lg custom-checkbox">
-        <input type="checkbox" class="custom-control-input" id="Outstanding" name="Outstanding" #Outstanding="ngModel"
+      <div class="custom-control form-control-lg custom-checkbox" style="padding-top: 0em;">
+        <input type="checkbox" class="custom-control-input" id="Status" name="Status" #Status="ngModel"
           [(ngModel)]="outstanding" (change)='preFilter()'>
-        <label class="custom-control-label" for="outstanding"></label>
+        <label class="custom-control-label" for="Status"></label>
       </div>
     </div>
-    <div class='col-sm-4'>
-      <input placeholder="Search ..." [value]="searchText" (keyup)="filter($event.target.value)">
-
-    </div>
-    <div class='col-sm-4'>
-      <label class='bu' style='margin-bottom: 0px;'>
-        Clear All Filters:
-      </label>
-      <button type="button" class="btn btn-sm btn-info" (click)="resetFilters()">Clear All Filters</button>
-    </div>
   </div>
-
   <div class='card' style='margin: auto;'>
     <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 1em;'
       *ngIf='filteredText'>
@@ -75,6 +56,7 @@
           <th (click)="sort('OrderDate')">Date</th>
           <th (click)="sort('OrderCustomer')">Customer</th>
           <th (click)="sort('OrderPayment')" *ngIf="!(isHandset$ | async)">Payment</th>
+          <th (click)="sort('FoldStore')">Store</th>
           <th (click)="sort('FoldStatus')" *ngIf="!(isHandset$ | async)">Status</th>
           <th (click)="sort('OrderItemTotal')">Item Total</th>
           <th (click)="sort('OrderTotal')" *ngIf="!(isHandset$ | async)">Total</th>
@@ -98,6 +80,9 @@
           <td *ngIf="!(isHandset$ | async)">
             {{ pak.OrderPayment}}
           </td>
+          <td>
+            {{ pak.FoldsStore}}
+          </td>
           <td *ngIf="!(isHandset$ | async)">
             {{ pak.FoldStatus}}
           </td>
@@ -105,7 +90,7 @@
             {{ pak.OrderItemTotal}}
           </td>
           <td *ngIf="!(isHandset$ | async)">
-            {{ pak.OrderTotal}}
+            ${{ pak.OrderTotal}}
           </td>
         </tr>
         <tr *ngIf="filteredText.length === 0">

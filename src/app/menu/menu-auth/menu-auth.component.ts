@@ -51,24 +51,24 @@ export class MenuAuthComponent implements OnInit {
   }
 
   getOrders() {
-    console.log(1);
-    this.globals.isSyncing = true;
-    this.spinner.show();
-    this.orderList = JSON.parse(this.globals.shopify);
-    this.service.getorders(this.totalOrders.toString())
-        .subscribe((cat: any[]) => {
-          console.log(cat);
-          this.totalOrders = null;
-          this.download = cat.toString();
-          this.globals.isSyncing = false;
-          this.spinner.hide();
-        },
-        (err) => {
-          console.log(4);
-          console.log(err);
-          this.globals.isSyncing = false;
-          this.spinner.hide();
-        });
+    // console.log(1);
+    // this.globals.isSyncing = true;
+    // this.spinner.show();
+    // this.orderList = JSON.parse(this.globals.shopify);
+    // this.service.getorders(this.totalOrders.toString())
+    //     .subscribe((cat: any[]) => {
+    //       console.log(cat);
+    //       this.totalOrders = null;
+    //       this.download = cat.toString();
+    //       this.globals.isSyncing = false;
+    //       this.spinner.hide();
+    //     },
+    //     (err) => {
+    //       console.log(4);
+    //       console.log(err);
+    //       this.globals.isSyncing = false;
+    //       this.spinner.hide();
+    //     });
   }
 
   SPGetOrders() {
@@ -92,12 +92,4 @@ export class MenuAuthComponent implements OnInit {
 
   }
 
-  getOrders4() {
-    console.log(100);
-   // this.orderList = JSON.parse(this.globals.shopOrders);
-    this.orderList = JSON.parse(this.globals.shopifyShort);
-    console.log(this.orderList);
-    console.log(Object.keys(this.orderList.orders).length);
-
-  }
 }

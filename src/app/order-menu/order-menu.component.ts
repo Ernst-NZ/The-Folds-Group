@@ -43,6 +43,7 @@ export class OrderMenuComponent implements OnInit {
   filteredText: any;
   tempText: any[] = [];
   searchText = '';
+  tempDate: number;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -103,6 +104,8 @@ export class OrderMenuComponent implements OnInit {
           fullText.FoldStatus.toLowerCase().indexOf(data.toLowerCase()) >
             -1 ||
           fullText.FoldStore.toLowerCase().indexOf(data.toLowerCase()) > -1
+          ||
+          fullText.OrderTotal.toString().toLowerCase().indexOf(data.toLowerCase()) > -1
         );
       });
     } else {
@@ -126,31 +129,38 @@ export class OrderMenuComponent implements OnInit {
   }
 
   preFilter() {
-    console.log('pre - filter');
+    console.log('start pre filter');
     if (this.dateFrom) {
-    let f_date: any;
-    const f_string = this.dateFrom.month.toString();
-    f_date = f_string.concat( '-', this.dateFrom.day.toString(), '-', this.dateFrom.year.toString()
-    );
-    this.selectedFromDate = new Date(f_date).getTime();
+      let f_date: any;
+      const f_string = this.dateFrom.month.toString();
+      f_date = f_string.concat(
+        '-',
+        this.dateFrom.day.toString(),
+        '-',
+        this.dateFrom.year.toString()
+      );
+      this.selectedFromDate = new Date(f_date).getTime();
     } else {
       this.selectedFromDate = '';
     }
     if (this.dateTo) {
       let t_date: any;
       const t_string = this.dateTo.month.toString();
-      t_date = t_string.concat( '-', this.dateTo.day.toString(), '-', this.dateTo.year.toString()
+      t_date = t_string.concat(
+        '-',
+        this.dateTo.day.toString(),
+        '-',
+        this.dateTo.year.toString()
       );
       this.selectedToDate = new Date(t_date).getTime();
-      } else {
-        this.selectedToDate = '';
-      }
+    } else {
+      this.selectedToDate = '';
+    }
     if (
       this.outstanding ||
       this.selectedToDate ||
       this.selectedToDate
     ) {
-      console.log('Do Filter');
       this.filterPromise();
     } else {
       console.log('NO Filter');
@@ -158,25 +168,32 @@ export class OrderMenuComponent implements OnInit {
     }
   }
 
+  formatDate(temp: string) {
+    const tmp = temp.split('/');
+    const date = tmp[1] + '/' + tmp[0] + '/' + tmp[2];
+    return new Date(date).getTime();
+  }
+
   async filterPromise(): Promise<void> {
+    console.log('start filter');
     this.filteredText = this.orderList;
- //   console.log(this.filteredText);
+    console.log(this.filteredText);
 
     if (this.selectedFromDate) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
-      return fullText.OrderDate >= +this.selectedFromDate;
+      return +this.formatDate(fullText.OrderDate) >= +this.selectedFromDate;
     });
     }
 
     if (this.selectedToDate) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
-      return fullText.OrderDate <= +this.selectedToDate;
+      return +this.formatDate(fullText.OrderDate) <= +this.selectedToDate;
     });
     }
 
     if (this.outstanding) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
-        return fullText.Status !== 'Fulfilled';
+        return fullText.FoldStatus !== 'Fulfilled';
       });
     }
   }

@@ -5,6 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ViewChild } from '@angular/core';
 import { NgbDateStruct, NgbCalendar, NgbDatepicker } from '@ng-bootstrap/ng-bootstrap';
+
 // import { NgbdDatepickerBasic } from './datepicker-basic';
 
 @Component({
@@ -14,6 +15,14 @@ import { NgbDateStruct, NgbCalendar, NgbDatepicker } from '@ng-bootstrap/ng-boot
 })
 export class MyTestComponent implements OnInit {
   title = 'angular-bootstrap-datepicker-tutorial';
+  marked = false;
+  theCheckbox = false;
+  checked = false;
+  indeterminate = false;
+  labelPosition: 'before' | 'after' = 'after';
+  disabled = false;
+  outstanding = false;
+  dateTo: NgbDateStruct;
 
   model: NgbDateStruct;
   date: { year: number, month: number };
@@ -30,6 +39,9 @@ export class MyTestComponent implements OnInit {
     console.log(this.model);
   }
 
+  toggleVisibility(e){
+    this.marked= e.target.checked;
+  }
   setCurrent() {
     //Current Date
     this.dp.navigateTo()
@@ -44,5 +56,14 @@ console.log(this.model);
 }
   navigateEvent(event) {
     this.date = event.next;
+  }
+
+  preFilter() {
+
+  }
+
+  preDate() {
+    console.log(this.dateTo);
+
   }
 }
