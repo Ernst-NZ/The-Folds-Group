@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ShopifyService } from '../_shared/shopify.service';
+import { VendService } from '../_shared/vend.service';
+import { Globals } from '../globals';
 
 @Component({
   selector: 'app-menu',
@@ -8,59 +10,21 @@ import { ShopifyService } from '../_shared/shopify.service';
 })
 export class MenuComponent implements OnInit {
   private service: ShopifyService;
-  orderList: Array<any> = [];
+  private vendService: VendService;
+  orderList: any;
+  totalOrders: number;
 
   constructor(
     service: ShopifyService,
+    vendService: VendService,
+    public globals: Globals
   ) {
     this.service = service;
+    this.vendService = vendService;
    }
 
   ngOnInit(): void {
+    console.log(this.globals.loginUser);
   }
 
-  getOrders() {
-    console.log(1);
-    this.service.getorders()
-        .subscribe((cat: any[]) => {
-          console.log(3);
-          (this.orderList = cat);
-          console.log(this.orderList);
-        },
-        (err) => {
-          console.log(4);
-          console.log(err);
-        });
-
-  }
-
-  getOrders2() {
-    console.log(1);
-    this.service.getorders2()
-        .subscribe((cat: any[]) => {
-          console.log(3);
-          (this.orderList = cat);
-          console.log(this.orderList);
-        },
-        (err) => {
-          console.log(4);
-          console.log(err);
-        });
-
-  }
-
-  getOrders3() {
-    console.log(1);
-    this.service.getorders3()
-        .subscribe((cat: any[]) => {
-          console.log(3);
-          (this.orderList = cat);
-          console.log(this.orderList);
-        },
-        (err) => {
-          console.log(4);
-          console.log(err);
-        });
-
-  }
 }

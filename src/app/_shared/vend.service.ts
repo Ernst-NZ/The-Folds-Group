@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class ShopifyService {
+export class VendService {
   reqHeader: any;
   editHeader: any;
   testHeader: any;
@@ -24,23 +24,24 @@ export class ShopifyService {
     this.editHeader = new HttpHeaders({ 'No-Auth': 'True' });
  }
 
-  getTotal(): Observable<any> {
-    console.log('Get Total Service');
-    return this.http.get<any>(this.rootURL + '/ShopifyTotal/');
+ getASPUsers(): Observable<any[]> {
+    return this.http.get<any[]>(this.rootURL + '/Users/SPGetUsers');
   }
 
-  getTest(endPoint: string): Observable<any> {
+  gettest(): Observable<any[]> {
     console.log(2);
-    return this.http.get<any>(this.rootURL + '/shopOrders/');
+    return this.http.get<any[]>(
+     'https://9090c9c4613998cb4e061f4255c95827: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@holdstest.myshopify.com/admin/orders.json?limit=250'
+      );
   }
 
-  getorders(endPoint: string): Observable<any> {
-    console.log('Get Total Service');
-    return this.http.get<any>(this.rootURL + '/ShopifyGetOrder/');
+  vendTest(): Observable<any> {
+    const accessToken = '4DbmXm5QdMr12HuLpDhOl_dLhdnn6gIRvW0Z1Y8f';
+    const reqHeader2 = new HttpHeaders({ Authorization: 'Bearer ' + accessToken });
+    return this.http.post('https://foldtest.vendhq.com/api/2.0/retailer', {
+      headers: reqHeader2
+    });
   }
 
-  SPGetOrders(): Observable<any> {
-    console.log('Get Total Service');
-    return this.http.get<any>(this.rootURL + '/SPGetOrders/');
-  }
+
 }

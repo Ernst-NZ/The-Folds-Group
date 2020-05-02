@@ -1,0 +1,83 @@
+<p>my-test works!</p>
+
+<div class='col-sm-4'>
+  <label class='bu' style='margin-bottom: 0px;'>
+    To Date:
+  </label>
+  <div class="input-group">
+    <input class="form-control" placeholder="dd-mm-yyyy" name="dpTo" [(ngModel)]="dateTo" ngbDatepicker
+      #dpTo="ngbDatepicker" (change)="preFilter()">
+    <div class="input-group-append">
+      <button class="btn btn-outline-secondary" (click)="dpTo.toggle(); preDate()" type="button"
+        style='padding-top: 0px; padding-bottom: 0px;'>
+        <i class="material-icons">
+          date_range
+        </i></button>
+    </div>
+  </div>
+</div>
+<div class='col-sm-2'>
+  <label class='bu' style='margin-bottom: 0px;'>
+    Outstanding:
+  </label>
+  <div class="custom-control form-control-lg custom-checkbox">
+    <input type="checkbox" class="custom-control-input" id="Status" name="Status" #Status="ngModel"
+      [(ngModel)]="outstanding" (change)='preFilter()'>
+    <label class="custom-control-label" for="Status"></label>
+  </div>
+</div>
+
+
+
+
+    <section class="example-section">
+      <mat-checkbox class="example-margin" [(ngModel)]="checked">Checked</mat-checkbox>
+      <mat-checkbox class="example-margin" [(ngModel)]="indeterminate">Indeterminate</mat-checkbox>
+    </section>
+
+
+<div style="background-color: blanchedalmond;">
+
+  <div class="form-check">
+    <label class="form-check-label">
+       <input type="checkbox" [ngModel]="false"> No
+    </label>
+</div>
+<label class="container">
+  <input type="checkbox" [(ngModel)]="theCheckbox"  data-md-icheck (change)="toggleVisibility($event)"/>
+      Checkbox is <span *ngIf="marked">checked</span><span *ngIf="!marked">unchecked</span>
+    <span class="checkmark"></span>
+  </label>
+
+    <div>And <b>ngModel</b> also works, it's value is <b>{{theCheckbox}}</b></div>
+<p>Inline datepicker Example</p>
+
+<ngb-datepicker #dp [(ngModel)]="model" (navigate)="date = $event.next"></ngb-datepicker>
+
+<input type="text" ngbDatepicker #d="ngbDatepicker"/>
+
+<hr/>
+
+<button class="btn btn-sm btn-outline-primary mr-2" (click)="selectToday()">Select Today</button>
+<button class="btn btn-sm btn-outline-primary mr-2" (click)="dp.navigateTo()">To current month</button>
+<button class="btn btn-sm btn-outline-primary mr-2" (click)="dp.navigateTo({year: 2013, month: 2})">To Feb 2013</button>
+
+<hr/>
+
+<pre>Month: {{ date.month }}.{{ date.year }}</pre>
+<pre>Model: {{ model | json }}</pre>
+ <br><br><br><br><br>
+
+<div class="input-group">
+
+  <input class="form-control" placeholder="yyyy-mm-dd" name="dp" [(ngModel)]="model" ngbDatepicker #d="ngbDatepicker">
+
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary calendar" (click)="d.toggle(); test()" type="button">📅</button>
+  </div>
+
+</div>
+<hr />
+<code>Model: {{ model | json }}</code>
+
+</div>

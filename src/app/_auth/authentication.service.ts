@@ -19,6 +19,7 @@ export class AuthenticationService {
         if (JSONObject) {
           // store user details and jwt token in local storage to keep user logged in between page refreshes
           localStorage.setItem('JSONToken', JSON.stringify(JSONObject.access_token));
+          this.globals.loginUser = true;
         }
 
         return JSONObject;
@@ -30,12 +31,9 @@ export class AuthenticationService {
     console.log('Clearing Token And All User Info');
     localStorage.removeItem('JSONToken');
     localStorage.removeItem('userToken');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('companyCode');
+    localStorage.removeItem('firstName');
     localStorage.removeItem('userCode');
     localStorage.removeItem('userName');
-    localStorage.removeItem('companyName');
-    this.globals.userRole = '';
     this.globals.userCode = '';
     this.globals.loginUser = false;
     this.globals.userName = '';

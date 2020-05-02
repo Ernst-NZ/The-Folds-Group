@@ -1,0 +1,86 @@
+<div class='container'>
+  <br>
+  <br>
+  <div class="container card">
+    <div class='center'>
+      <label class='fontBlack'>
+        <h2>Register New User for Folds Group</h2>
+      </label>
+    </div>
+    <br>
+    <div class='center backBlue redBorder'>
+      <div *ngIf="isRegisterError" class="fontWhite center error-message">
+        <i class="material-icons" style="vertical-align: middle">error</i> Registration Failed
+      </div>
+      <br>
+      <form class="col s12 left" #userRegistrationForm="ngForm" (ngSubmit)="OnSubmit(userRegistrationForm)"
+        autocomplete="off">
+        <div class="row">
+          <div class="col-sm-12 col-md-3 fontWhite">
+            <label data-error="Required field!">User Name</label>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <input class="form-control" type="text" name="UserName" #UserName="ngModel" [(ngModel)]="user.UserName"
+              required>
+          </div>
+          <div class="col-sm-12 col-md-3 fontWhite">
+            <label data-error="Invalid email!" for="Email">Email Address</label>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <input class="form-control" type="text" name="Email" #Email="ngModel" [(ngModel)]="user.Email"
+              [pattern]="emailPattern">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12 col-md-3 fontWhite">
+            <label
+              [attr.data-error]="Password.errors!=null?(Password.errors.required?'Required field!':'Minimum 4 characters needed'):''">Password</label>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <input class="form-control" type="password" name="Password" #Password="ngModel" [(ngModel)]="user.Password"
+              required minlength="4">
+          </div>
+          <div class="col-sm-12 col-md-3 fontWhite">
+            <label class="label1" for="ConfirmPassword">
+              Confirm Password
+            </label>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <input class="form-control" type="password" name="ConfirmPassword" #ConfirmPassword="ngModel"
+              [(ngModel)]="user.ConfirmPassword">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12 col-md-3 fontWhite">
+            <label>First Name</label>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <input class="form-control" type="text" name="FirstName" #FirstName="ngModel" [(ngModel)]="user.FirstName"
+              required>
+          </div>
+          <div class="col-sm-12 col-md-3 fontWhite">
+            <label>Last Name</label>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <input class="form-control" type="text" name="LastName" #LastName="ngModel" [(ngModel)]="user.LastName">
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col s12 right">
+            <button [disabled]="!userRegistrationForm.valid" class="btn-large btn-submit btn-info"
+              type="submit">{{btnText}}</button>
+          </div>
+        </div>
+
+        <br>
+        <br>
+      </form>
+    </div>
+    <br>
+    <br>
+    <br>
+  </div>
+</div>
