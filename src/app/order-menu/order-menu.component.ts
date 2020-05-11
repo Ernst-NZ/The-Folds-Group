@@ -170,7 +170,7 @@ export class OrderMenuComponent implements OnInit {
 
   formatDate(temp: string) {
     const tmp = temp.split('/');
-    const date = tmp[1] + '/' + tmp[0] + '/' + tmp[2];
+    const date = tmp[0] + '/' + tmp[1] + '/' + tmp[2];
     return new Date(date).getTime();
   }
 
