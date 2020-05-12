@@ -35,6 +35,7 @@ export interface IShopOrders {
   FoldStore: string;
   FoldStatus: string;
   FoldShipDate: string;
+  FoldComments: string;
 }
 
 export class ShopOrders implements IShopOrders {
@@ -52,4 +53,5 @@ export class ShopOrders implements IShopOrders {
   FoldStore: string;
   FoldStatus: string;
   FoldShipDate: string;
+  FoldComments: string;
 }

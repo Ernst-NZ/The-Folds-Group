@@ -34,13 +34,19 @@ export class ShopifyService {
     return this.http.get<any>(this.rootURL + '/shopOrders/');
   }
 
-  getorders(endPoint: string): Observable<any> {
+  getorders(): Observable<any> {
     console.log('Get Total Service');
-    return this.http.get<any>(this.rootURL + '/ShopifyGetOrder/');
+    return this.http.get<any>(this.rootURL + '/ShopifyGetOrder');
   }
 
   SPGetOrders(): Observable<any> {
     console.log('Get Total Service');
     return this.http.get<any>(this.rootURL + '/SPGetOrders/');
   }
+
+  CTGetMultiOrders(OrderNo: string): Observable<any> {
+    console.log('Get Multi Orders', OrderNo);
+    return this.http.get<any>(this.rootURL + '/MultiStore/' + OrderNo);
+  }
+
 }

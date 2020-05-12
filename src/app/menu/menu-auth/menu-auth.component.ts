@@ -28,20 +28,37 @@ export class MenuAuthComponent implements OnInit {
   ) {
     this.service = service;
     this.vendService = vendService;
-   }
+  }
 
   ngOnInit(): void {
     if (!this.globals.download) {
       this.globals.isSyncing = true;
       this.spinner.show();
       this.service.getTotal()
-          .subscribe((cat: any[]) => {
-            this.count = cat;
-            if (this.count['count']) {}
-            this.totalOrders = this.count['count'];
-            this.globals.isSyncing = false;
-            this.spinner.hide();
-          },
+        .subscribe((cat: any[]) => {
+          this.count = cat;
+          console.log(this.count);
+          if (this.count['count']) { }
+          this.totalOrders = this.count['count'] - 1 ;
+          if (this.totalOrders > 0) {
+            this.service.getorders()
+              .subscribe((cat: any[]) => {
+                console.log(cat);
+                this.totalOrders = null;
+                this.download = cat.toString();
+                this.globals.isSyncing = false;
+                this.spinner.hide();
+              },
+                (err) => {
+                  console.log(4);
+                  console.log(err);
+                  this.globals.isSyncing = false;
+                  this.spinner.hide();
+                });
+          }
+          this.globals.isSyncing = false;
+          this.spinner.hide();
+        },
           (err) => {
             console.log(err);
             this.globals.isSyncing = false;
@@ -54,14 +71,14 @@ export class MenuAuthComponent implements OnInit {
     console.log(1);
     this.globals.isSyncing = true;
     this.spinner.show();
-    this.service.getorders(this.totalOrders.toString())
-        .subscribe((cat: any[]) => {
-          console.log(cat);
-          this.totalOrders = null;
-          this.download = cat.toString();
-          this.globals.isSyncing = false;
-          this.spinner.hide();
-        },
+    this.service.getorders()
+      .subscribe((cat: any[]) => {
+        console.log(cat);
+        this.totalOrders = null;
+        this.download = cat.toString();
+        this.globals.isSyncing = false;
+        this.spinner.hide();
+      },
         (err) => {
           console.log(4);
           console.log(err);

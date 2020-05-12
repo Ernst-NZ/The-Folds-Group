@@ -44,6 +44,9 @@ export class OrderMenuComponent implements OnInit {
   tempText: any[] = [];
   searchText = '';
   tempDate: number;
+  MultiOrders: any;
+  FoldComments: string;
+  Allocated = false;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -62,7 +65,6 @@ export class OrderMenuComponent implements OnInit {
       .subscribe((cat: IShopOrders[]) => {
         (this.orderList = cat);
         this.filteredText = this.orderList;
-        console.log(this.orderList);
       },
         (err) => {
           console.log(err);
@@ -98,8 +100,6 @@ export class OrderMenuComponent implements OnInit {
           fullText.OrderNumber.toLowerCase().indexOf(data.toLowerCase()) > -1 ||
           fullText.OrderDate.toLowerCase().indexOf(data.toLowerCase()) > -1 ||
           fullText.OrderCustomer.toLowerCase().indexOf(data.toLowerCase()) >
-            -1 ||
-          fullText.OrderPayment.toLowerCase().indexOf(data.toLowerCase()) >
             -1 ||
           fullText.FoldStatus.toLowerCase().indexOf(data.toLowerCase()) >
             -1 ||
@@ -170,7 +170,7 @@ export class OrderMenuComponent implements OnInit {
 
   formatDate(temp: string) {
     const tmp = temp.split('/');
-    const date = tmp[0] + '/' + tmp[1] + '/' + tmp[2];
+    const date = tmp[1] + '/' + tmp[0] + '/' + tmp[2];
     return new Date(date).getTime();
   }
 
@@ -205,18 +205,44 @@ export class OrderMenuComponent implements OnInit {
     window.open(orderAddress, '_blank');
   }
 
-  openLog(content, i: any, ) {
+  openComments(comments, i: any, ) {
+
+    if (i.FoldStatus !== 'Fulfilled' && (i.FoldStore !== 'NO SKU' && i.FoldStore !== 'Multiple Stores' ))
+     {
+      this.Allocated = true;
+    } else {
+      this.Allocated = false;
+    }
+    console.log('###################',this.Allocated);
+    this.FoldComments = i.FoldComments;
+    if (i.FoldStore === 'NO SKU' || i.FoldStore === 'Multiple Stores') {
+      this.spinner.show();
+      this.service.CTGetMultiOrders(i.OrderNumber)
+    .subscribe((cat: any) => {
+      (this.MultiOrders = cat);
+      console.log(this.MultiOrders);
+      this.spinner.hide();
+    },
+      (err) => {
+        console.log(err);
+        this.spinner.hide();
+      });
+    }
+    console.log(i);
     this.modalService
-      .open(content, { ariaLabelledBy: 'modal-basic-title' })
+      .open(comments, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
         result => {
           this.closeResult = `Closed with: ${result}`;
+          this.MultiOrders = '';
+          this.Allocated = false;
         },
         reason => {
           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          this.MultiOrders = '';
+          this.Allocated = false;
         }
       );
-    window.location.href = 'https://thefoldgroup.myshopify.com/admin/orders/2087487799330';
   }
 
   private getDismissReason(reason: any): string {
@@ -227,6 +253,13 @@ export class OrderMenuComponent implements OnInit {
     } else {
       return `with: ${reason}`;
     }
+  }
+
+  onProdSelect(args) {
+    console.log(args.target.value);
+    console.log(args.target.value);
+
+
   }
 
 
