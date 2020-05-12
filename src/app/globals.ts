@@ -4,8 +4,8 @@ import { Injectable } from '@angular/core';
 export class Globals {
 //  dataSource: String =  'https://data.nzsats.co.nz'
 //  dataSource: 'http://testdata.nzsats.co.nz';
-//  dataSource: 'http://fold.ezy.kiwi/';
- dataSource = 'http://localhost:52783';
+ dataSource = 'https://fold.ezy.kiwi/';
+// dataSource = 'http://localhost:52783';
 //  dataSource: String = 'http://localhost:3000';
   userName: string;
   FirstName: string;

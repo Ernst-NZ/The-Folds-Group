@@ -14,7 +14,7 @@
         <div class="menuBanner3">
           <a class="btn btn-light btn-block myButtons" >Download Orders &raquo;
           </a>
-          <p class="btn btn-light btn-block myButtons">{{ totalOrders }}</p>
+          <p class="btn btn-light btn-block myButtons" style="min-width: 200PX;">Downloading {{totalOrders }} order/s</p>
         </div>
       </a>
     </div>
@@ -54,5 +54,5 @@
 
 <ngx-spinner bdOpacity=0.9 bdColor="" size="medium" color="#f30808" type="ball-running-dots" fullScreen="false">
 </ngx-spinner>
-<p [hidden]="!globals.isSyncing" style="text-align: center; font-size: 2em; color: red;">Getting Orders ...</p>
+<p [hidden]="!globals.isSyncing" style="text-align: center; font-size: 2em; color: red;">Getting {{this.totalOrders }} Orders...</p>
 

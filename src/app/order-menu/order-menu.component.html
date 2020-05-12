@@ -1,4 +1,4 @@
-<div class='container' *ngIf="this.filteredText">
+<div class='container-fluid' *ngIf="this.filteredText">
   <div class='row' style='text-align: center; margin: auto;'>
     <div class='col-12' style='text-align: center;'>
       <h2><u>The Fold Group Orders</u></h2>
@@ -10,7 +10,8 @@
       <label class='bu' style='margin-bottom: 0px;'>
         Search:
       </label><br>
-      <input placeholder="Search ..." [value]="searchText" (keyup)="filter($event.target.value)" style="height: 2.5em; width: 100%; border-radius: 5px; vertical-align: middle; padding-left: 5px;">
+      <input placeholder="Search ..." [value]="searchText" (keyup)="filter($event.target.value)"
+        style="height: 2.5em; width: 100%; border-radius: 5px; vertical-align: middle; padding-left: 5px;">
     </div>
     <div class='col-sm-3'>
       <label class='bu' style='margin-bottom: 0px;'>
@@ -55,21 +56,26 @@
           <th (click)="sort('OrderNumber')">Order ({{filteredText.length}})</th>
           <th (click)="sort('OrderDate')">Date</th>
           <th (click)="sort('OrderCustomer')">Customer</th>
-          <th (click)="sort('OrderPayment')" *ngIf="!(isHandset$ | async)">Payment</th>
+          <!-- <th (click)="sort('OrderPayment')" *ngIf="!(isHandset$ | async)">Payment</th> -->
           <th (click)="sort('FoldStore')">Store</th>
           <th (click)="sort('FoldStatus')" *ngIf="!(isHandset$ | async)">Status</th>
           <th (click)="sort('OrderItemTotal')">Item Total</th>
           <th (click)="sort('OrderTotal')" *ngIf="!(isHandset$ | async)">Total</th>
+          <th (click)="sort('FoldComments')" *ngIf="!(isHandset$ | async)">Comments</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let pak of this.filteredText; let i = index" [attr.data-index]="i"
           [ngClass]="(pak.FoldStatus)?'fontBlack':'fontRed'">
           <td>
-            <button *ngIf='pak.FoldStatus === "Fulfilled"' class="btn btn-success btn-large btn-block" (click)="getOrder(pak.OrderId)"
+            <button *ngIf='!pak.FoldStatus && (pak.FoldStore !== "NO SKU" && pak.FoldStore !== "Multiple Stores" )'
+              class="btn btn-warning btn-small btn-block" (click)="getOrder(pak.OrderId)"
               style='text-align: left;'>#{{ pak.OrderNumber }}</button>
-            <button *ngIf='!pak.FoldStatus' class="btn btn-danger btn-large btn-block" (click)="getOrder(pak.OrderId)"
+            <button *ngIf='!pak.FoldStatus && (pak.FoldStore === "NO SKU" || pak.FoldStore === "Multiple Stores" )'
+              class="btn btn-danger btn-small btn-block" (click)="getOrder(pak.OrderId)"
               style='text-align: left;'>#{{ pak.OrderNumber }}</button>
+            <button *ngIf='pak.FoldStatus === "Fulfilled"' class="btn btn-success btn-small btn-block"
+              (click)="getOrder(pak.OrderId)" style='text-align: left;'>#{{ pak.OrderNumber }}</button>
           </td>
           <td>
             {{ pak.OrderDate}}
@@ -77,11 +83,18 @@
           <td>
             {{ pak.OrderCustomer}}
           </td>
-          <td *ngIf="!(isHandset$ | async)">
+          <!-- <td *ngIf="!(isHandset$ | async)">
             {{ pak.OrderPayment}}
-          </td>
+          </td> -->
           <td>
-            {{ pak.FoldsStore}}
+            <button *ngIf='!pak.FoldStatus && (pak.FoldStore !== "NO SKU" && pak.FoldStore !== "Multiple Stores" )'
+              class="btn btn-warning btn-small btn-block" (click)="openComments(comments, pak)"
+              style='text-align: left;'>{{ pak.FoldStore }}</button>
+            <button *ngIf='!pak.FoldStatus && (pak.FoldStore === "NO SKU" || pak.FoldStore === "Multiple Stores" )'
+              class="btn btn-danger btn-small btn-block" (click)="openComments(comments, pak)"
+              style='text-align: left;'>{{ pak.FoldStore }}</button>
+            <button *ngIf='pak.FoldStatus === "Fulfilled"' class="btn btn-success btn-small btn-block"
+              (click)="openComments(comments, pak)" style='text-align: left;'>{{ pak.FoldStore }}</button>
           </td>
           <td *ngIf="!(isHandset$ | async)">
             {{ pak.FoldStatus}}
@@ -91,6 +104,9 @@
           </td>
           <td *ngIf="!(isHandset$ | async)">
             ${{ pak.OrderTotal}}
+          </td>
+          <td *ngIf="!(isHandset$ | async)">
+            <span [innerHTML]="pak.FoldComments" style="width:95%; opacity: 0.8; font-size: 1em"></span>
           </td>
         </tr>
         <tr *ngIf="filteredText.length === 0">
@@ -103,19 +119,110 @@
   </div>
 </div>
 
-<ng-template #log let-modal>
-  <div class="modal-header">
-    <h3 class="modal-title" id="modal-basic-title">Log Comments</h3>
+<ng-template #comments let-modal class="container-fluid" style="width: 100%; max-width: 1500px;">
+  <div class="modal-header container-fluid fontBlack">
+    <h3 class="modal-title" id="modal-basic-title">Sale Comments</h3><br>
+    <hr>
+    <span [innerHTML]="FoldComments"></span>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body appBackGround">
+    <div *ngIf='this.Allocated === true'>
+      <h3> - To Do - <br>Order has been allocated but not dispatched</h3>
+    </div>
+
+
+    <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 1em; width: 100%; font-weight: bold;'
+    *ngIf='MultiOrders'>
+    <thead class="table-primary">
+      <tr>
+        <th (click)="sort('ItemId')">No<br>Ordered</th>
+        <th (click)="sort('ItemSku')">SKU</th>
+        <th (click)="sort('Store')">Available At</th>
+        <th (click)="sort('LastSale')">Last Sale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr [ngClass]="(pak.ItemId)?'fontBlack':'fontRed'" *ngFor="let pak of this.MultiOrders; let i = index" [attr.data-index]="i">
+        <td>
+          {{ pak.ItemId }}
+        </td>
+        <td>
+          {{ pak.ItemSKU}}
+        </td>
+        <td>
+          <select *ngIf='pak.ItemSKU != "Total"' class="custom-select" style="width: 100%" name="Id" (change)='onProdSelect($event)'>
+            <option [value]="0">-Select Store-</option>
+            <option *ngFor="let user of MultiOrders" [value]="user.Brooklyn">{{ user.Brooklyn}}</option>
+          </select>
+        </td>
+        <td>
+          {{ pak.LastSale }}
+        </td>
+      </tr>
+      <tr *ngIf="filteredText.length === 0">
+        <td colspan='6'>
+          <span>No Information Available</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+<!--
+    <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 0.8em; width: 100%; font-weight: bold;'
+    *ngIf='MultiOrders'>
+    <thead class="table-primary">
+      <tr>
+        <th (click)="sort('ItemId')">No<br>Ordered</th>
+        <th (click)="sort('ItemSku')">SKU</th>
+        <th (click)="sort('Brooklyn')">Brooklyn</th>
+        <th (click)="sort('Howard')">Howard</th>
+        <th (click)="sort('GoodLad')">GoodLad</th>
+        <th (click)="sort('West')">West</th>
+        <th (click)="sort('LastSale')">Last Sale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr [ngClass]="(pak.ItemId)?'fontBlack':'fontRed'" *ngFor="let pak of this.MultiOrders; let i = index" [attr.data-index]="i">
+        <td>
+          <span *ngIf='pak.ItemId === 0'>Ask In Store</span>
+          <span *ngIf='pak.ItemId !== 0'>{{ pak.ItemId }}</span>
+        </td>
+        <td>
+          {{ pak.ItemSKU}}
+        </td>
+        <td>
+          {{ pak.Brooklyn}}
+        </td>
+        <td>
+          {{ pak.Howard}}
+        </td>
+        <td>
+          {{ pak.Goodlad}}
+        </td>
+        <td>
+          {{ pak.West}}
+        </td>
+        <td>
+          {{ pak.LastSale }}
+        </td>
+      </tr>
+      <tr *ngIf="filteredText.length === 0">
+        <td colspan='6'>
+          <span>No Information Available</span>
+        </td>
+      </tr>
+    </tbody>
+  </table> -->
+
     <label [innerHTML]="" style="width:95%; opacity: 0.8; font-size: 1em"></label>
 
   </div>
 </ng-template>
 
 <ngx-spinner bdOpacity=0.9 bdColor="" size="medium" color="#f30808" type="ball-running-dots" fullScreen="false">
-  <p style="color: red"> Loading... </p>
+  <h1 style="color: white; background-color: darkgray;">  Getting Live Stock Levels... </h1>
 </ngx-spinner>
