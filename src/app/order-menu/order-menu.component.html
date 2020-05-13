@@ -121,7 +121,7 @@
 
 <ng-template #comments let-modal class="container-fluid" style="width: 100%; max-width: 1500px;">
   <div class="modal-header container-fluid fontBlack">
-    <h3 class="modal-title" id="modal-basic-title">Sale Comments</h3><br>
+    <h3 class="modal-title" id="modal-basic-title">Sale Comments<br><b><u>Order: #{{OrderNo}}</u></b> </h3><br>
     <hr>
     <span [innerHTML]="FoldComments"></span>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
@@ -132,8 +132,13 @@
     <div *ngIf='this.Allocated === true'>
       <h3> - To Do - <br>Order has been allocated but not dispatched</h3>
     </div>
+    <div>
+      <button class="btn btn-info btn-small btn-block center"
+      (click)="openVend()" style='text-align: center; max-width: 250px; margin: auto; '>Open Vend Order</button>
+    </div>
 
-
+    <div *ngIf='MultiOrders' style="text-align: center;"><button class="btn btn-warning btn-small btn-block center"
+      (click)="getCurrent()" style='text-align: center; max-width: 250px; margin: auto; font-weight: bold; text-decoration: underline;'>Get Current Stock Levels<br>(This will take some time!)</button></div>
     <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 1em; width: 100%; font-weight: bold;'
     *ngIf='MultiOrders'>
     <thead class="table-primary">
@@ -147,15 +152,15 @@
     <tbody>
       <tr [ngClass]="(pak.ItemId)?'fontBlack':'fontRed'" *ngFor="let pak of this.MultiOrders; let i = index" [attr.data-index]="i">
         <td>
-          {{ pak.ItemId }}
+          <span *ngIf='pak.ItemSKU != "Total"'>{{ pak.ItemId }}</span>
         </td>
         <td>
-          {{ pak.ItemSKU}}
+          <span *ngIf='pak.ItemSKU != "Total"'>{{ pak.ItemSKU}}</span>
         </td>
         <td>
           <select *ngIf='pak.ItemSKU != "Total"' class="custom-select" style="width: 100%" name="Id" (change)='onProdSelect($event)'>
             <option [value]="0">-Select Store-</option>
-            <option *ngFor="let user of MultiOrders" [value]="user.Brooklyn">{{ user.Brooklyn}}</option>
+            <option *ngFor="let s of pak.Store" [value]="s.Store">{{ s.Store}}</option>
           </select>
         </td>
         <td>
@@ -170,59 +175,11 @@
     </tbody>
   </table>
 
-
-<!--
-    <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 0.8em; width: 100%; font-weight: bold;'
-    *ngIf='MultiOrders'>
-    <thead class="table-primary">
-      <tr>
-        <th (click)="sort('ItemId')">No<br>Ordered</th>
-        <th (click)="sort('ItemSku')">SKU</th>
-        <th (click)="sort('Brooklyn')">Brooklyn</th>
-        <th (click)="sort('Howard')">Howard</th>
-        <th (click)="sort('GoodLad')">GoodLad</th>
-        <th (click)="sort('West')">West</th>
-        <th (click)="sort('LastSale')">Last Sale</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr [ngClass]="(pak.ItemId)?'fontBlack':'fontRed'" *ngFor="let pak of this.MultiOrders; let i = index" [attr.data-index]="i">
-        <td>
-          <span *ngIf='pak.ItemId === 0'>Ask In Store</span>
-          <span *ngIf='pak.ItemId !== 0'>{{ pak.ItemId }}</span>
-        </td>
-        <td>
-          {{ pak.ItemSKU}}
-        </td>
-        <td>
-          {{ pak.Brooklyn}}
-        </td>
-        <td>
-          {{ pak.Howard}}
-        </td>
-        <td>
-          {{ pak.Goodlad}}
-        </td>
-        <td>
-          {{ pak.West}}
-        </td>
-        <td>
-          {{ pak.LastSale }}
-        </td>
-      </tr>
-      <tr *ngIf="filteredText.length === 0">
-        <td colspan='6'>
-          <span>No Information Available</span>
-        </td>
-      </tr>
-    </tbody>
-  </table> -->
-
     <label [innerHTML]="" style="width:95%; opacity: 0.8; font-size: 1em"></label>
 
   </div>
 </ng-template>
 
 <ngx-spinner bdOpacity=0.9 bdColor="" size="medium" color="#f30808" type="ball-running-dots" fullScreen="false">
-  <h1 style="color: white; background-color: darkgray;">  Getting Live Stock Levels... </h1>
+  <h1 style="color: white; background-color: darkgray;"> Loading... </h1>
 </ngx-spinner>

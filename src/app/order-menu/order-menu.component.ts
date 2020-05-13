@@ -42,10 +42,13 @@ export class OrderMenuComponent implements OnInit {
   closeResult: string;
   filteredText: any;
   tempText: any[] = [];
+  captures: any[] = [];
   searchText = '';
   tempDate: number;
   MultiOrders: any;
   FoldComments: string;
+  OrderNo: string;
+  OrderId: string;
   Allocated = false;
 
   constructor(
@@ -61,13 +64,16 @@ export class OrderMenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.spinner.show();
     this.service.SPGetOrders()
       .subscribe((cat: IShopOrders[]) => {
         (this.orderList = cat);
         this.filteredText = this.orderList;
+        this.spinner.hide();
       },
         (err) => {
           console.log(err);
+          this.spinner.hide();
         });
 
     const tempYear = new Date().getFullYear();
@@ -88,21 +94,20 @@ export class OrderMenuComponent implements OnInit {
     console.log('text', this.searchText);
     this.searchText = event;
 
-}
+  }
 
 
   filter(event) {
     if (event) {
-      console.log('search');
       const data = event;
       this.filteredText = this.orderList.filter((fullText: IShopOrders) => {
         return (
           fullText.OrderNumber.toLowerCase().indexOf(data.toLowerCase()) > -1 ||
           fullText.OrderDate.toLowerCase().indexOf(data.toLowerCase()) > -1 ||
           fullText.OrderCustomer.toLowerCase().indexOf(data.toLowerCase()) >
-            -1 ||
+          -1 ||
           fullText.FoldStatus.toLowerCase().indexOf(data.toLowerCase()) >
-            -1 ||
+          -1 ||
           fullText.FoldStore.toLowerCase().indexOf(data.toLowerCase()) > -1
           ||
           fullText.OrderTotal.toString().toLowerCase().indexOf(data.toLowerCase()) > -1
@@ -118,7 +123,6 @@ export class OrderMenuComponent implements OnInit {
     this.oldFrom = this.dateFrom;
     this.oldTo = this.dateTo;
     this.pendingDate = true;
-    console.log(this.oldFrom);
   }
 
   resetFilters() {
@@ -129,7 +133,6 @@ export class OrderMenuComponent implements OnInit {
   }
 
   preFilter() {
-    console.log('start pre filter');
     if (this.dateFrom) {
       let f_date: any;
       const f_string = this.dateFrom.month.toString();
@@ -174,21 +177,53 @@ export class OrderMenuComponent implements OnInit {
     return new Date(date).getTime();
   }
 
+  StoreList(store: string, stock: number) {
+    this.captures.push({
+      Store: stock + ' - ' + store,
+    });
+    return this.captures;
+  }
+
+  getStore() {
+    if (this.MultiOrders) {
+      for (let n = 0; n < this.MultiOrders.length; n++) {
+        const ordered = this.MultiOrders[n]['ItemId'];
+        this.captures = [];
+        if (this.MultiOrders[n]['Brooklyn'] >= ordered && this.MultiOrders[n]['ItemSKU'] !== 'Total') {
+          const temp = this.StoreList('Brooklyn', this.MultiOrders[n]['Brooklyn']);
+          this.MultiOrders[n]['Store'] = temp;
+        }
+        if (this.MultiOrders[n]['GoodLad'] >= ordered) {
+          const temp = this.StoreList('GoodLad', this.MultiOrders[n]['GoodLad']);
+          this.MultiOrders[n]['Store'] = temp;
+        }
+        if (this.MultiOrders[n]['Howard'] >= ordered) {
+          const temp = this.StoreList('Howard', this.MultiOrders[n]['Howard']);
+          this.MultiOrders[n]['Store'] = temp;
+        }
+        if (this.MultiOrders[n]['West'] >= ordered) {
+          const temp = this.StoreList('West', this.MultiOrders[n]['West']);
+          this.MultiOrders[n]['Store'] = temp;
+        }
+      }
+    }
+  }
+
   async filterPromise(): Promise<void> {
     console.log('start filter');
     this.filteredText = this.orderList;
-    console.log(this.filteredText);
+    // console.log(this.filteredText);
 
     if (this.selectedFromDate) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
-      return +this.formatDate(fullText.OrderDate) >= +this.selectedFromDate;
-    });
+        return +this.formatDate(fullText.OrderDate) >= +this.selectedFromDate;
+      });
     }
 
     if (this.selectedToDate) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
-      return +this.formatDate(fullText.OrderDate) <= +this.selectedToDate;
-    });
+        return +this.formatDate(fullText.OrderDate) <= +this.selectedToDate;
+      });
     }
 
     if (this.outstanding) {
@@ -198,7 +233,6 @@ export class OrderMenuComponent implements OnInit {
     }
   }
 
-
   getOrder(orderid: string) {
     let orderAddress = 'https://thefoldgroup.myshopify.com/admin/orders/';
     orderAddress = orderAddress.concat(orderid);
@@ -206,29 +240,27 @@ export class OrderMenuComponent implements OnInit {
   }
 
   openComments(comments, i: any, ) {
-
-    if (i.FoldStatus !== 'Fulfilled' && (i.FoldStore !== 'NO SKU' && i.FoldStore !== 'Multiple Stores' ))
-     {
+    this.OrderNo = i.OrderNumber;
+    this.OrderId = i.OrderId;
+    if (i.FoldStatus !== 'Fulfilled' && (i.FoldStore !== 'NO SKU' && i.FoldStore !== 'Multiple Stores')) {
       this.Allocated = true;
     } else {
       this.Allocated = false;
     }
-    console.log('###################',this.Allocated);
     this.FoldComments = i.FoldComments;
     if (i.FoldStore === 'NO SKU' || i.FoldStore === 'Multiple Stores') {
       this.spinner.show();
-      this.service.CTGetMultiOrders(i.OrderNumber)
-    .subscribe((cat: any) => {
-      (this.MultiOrders = cat);
-      console.log(this.MultiOrders);
-      this.spinner.hide();
-    },
-      (err) => {
-        console.log(err);
-        this.spinner.hide();
-      });
+      this.service.CTGetMultiOrders_Static(i.OrderNumber)
+        .subscribe((cat: any) => {
+          (this.MultiOrders = cat);
+          this.getStore();
+          this.spinner.hide();
+        },
+          (err) => {
+            console.log(err);
+            this.spinner.hide();
+          });
     }
-    console.log(i);
     this.modalService
       .open(comments, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
@@ -261,6 +293,39 @@ export class OrderMenuComponent implements OnInit {
 
 
   }
+  getCurrent() {
+    this.spinner.show();
+    this.service.CTGetMultiOrders(this.OrderNo)
+      .subscribe((cat: any) => {
+        (this.MultiOrders = cat);
+        this.getStore();
+        this.spinner.hide();
+      },
+        (err) => {
+          console.log(err);
+          this.spinner.hide();
+        });
+  }
 
+  openVend() {
+    let VendId: string;
+    console.log(this.OrderNo);
+    this.service.CTGetVendID(this.OrderNo)
+      .subscribe((cat: any) => {
+        (VendId = cat);
+        console.log(VendId, cat);
+        this.spinner.hide();
+        let orderAddress = 'https://thefold.vendhq.com/history#';
+        orderAddress = orderAddress.concat(VendId);
+        window.open(orderAddress, '_blank');
+        //    https://thefold.vendhq.com/history#59423c0f-8e53-b7a4-11ea-94a123b534f8
+
+      },
+        (err) => {
+          console.log(err);
+          this.spinner.hide();
+        });
+  }
+  test() { }
 
 }

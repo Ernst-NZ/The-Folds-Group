@@ -39,7 +39,7 @@ export class MenuAuthComponent implements OnInit {
           this.count = cat;
           console.log(this.count);
           if (this.count['count']) { }
-          this.totalOrders = this.count['count'] - 1 ;
+          this.totalOrders = this.count['count'] ;
           if (this.totalOrders > 0) {
             this.service.getorders()
               .subscribe((cat: any[]) => {
