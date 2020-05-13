@@ -49,4 +49,16 @@ export class ShopifyService {
     return this.http.get<any>(this.rootURL + '/MultiStore/' + OrderNo);
   }
 
+  CTGetMultiOrders_Static(OrderNo: string): Observable<any> {
+    console.log('Get Multi Orders', OrderNo);
+    return this.http.get<any>(this.rootURL + '/MultiStore_Static/' + OrderNo);
+  }
+
+  CTGetVendID(OrderNo: string): Observable<string> {
+    console.log('Get VendId', OrderNo);
+    return this.http.get<string>(this.rootURL + '/OpenVend/' + OrderNo);
+  }
+
+
+
 }
