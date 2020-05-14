@@ -153,21 +153,30 @@
       <tr [ngClass]="(pak.ItemId)?'fontBlack':'fontRed'" *ngFor="let pak of this.MultiOrders; let i = index" [attr.data-index]="i">
         <td>
           <span *ngIf='pak.ItemSKU != "Total"'>{{ pak.ItemId }}</span>
+          <span *ngIf='pak.ItemSKU === "Total"'>{{ OrderItemTotal}}</span>
         </td>
         <td>
           <span *ngIf='pak.ItemSKU != "Total"'>{{ pak.ItemSKU}}</span>
         </td>
         <td>
-          <select *ngIf='pak.ItemSKU != "Total"' class="custom-select" style="width: 100%" name="Id" (change)='onProdSelect($event)'>
+          <select *ngIf='pak.ItemSKU != "Total"' class="custom-select" style="width: 100%" name="Id" (change)='onProdSelect($event)' >
             <option [value]="0">-Select Store-</option>
-            <option *ngFor="let s of pak.Store" [value]="s.Store">{{ s.Store}}</option>
+            <option *ngFor="let s of pak.Store" [value]="s.SKU">{{ s.Stock }} - {{ s.Store}}</option>
           </select>
+          <label  *ngIf='pak.ItemSKU === "Total"' >{{ this.tempSplit.length }}</label>
         </td>
         <td>
           {{ pak.LastSale }}
+
         </td>
       </tr>
-      <tr *ngIf="filteredText.length === 0">
+      <tr>
+        <td colspan="3">
+          <button *ngIf='this.tempSplit.length === OrderItemTotal' class="btn btn-info btn-small"
+              (click)="test()" style='text-align: left;'>Proses Orders</button>
+        </td>
+      </tr>
+      <tr *ngIf="MultiOrders.length === 0">
         <td colspan='6'>
           <span>No Information Available</span>
         </td>
@@ -175,11 +184,41 @@
     </tbody>
   </table>
 
-    <label [innerHTML]="" style="width:95%; opacity: 0.8; font-size: 1em"></label>
+  <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 1em; width: 100%; font-weight: bold;' *ngIf='splitTotal.length > 0'>
+  <thead class="table-primary">
+    <tr>
+      <th (click)="sort('Store')">Store</th>
+      <th (click)="sort('Items')">Items</th>
+      <th (click)="sort('Items')">SKU Numbers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let pak of this.splitTotal; let i = index" [attr.data-index]="i">
+      <td>
+        <span>{{ pak.Store }}</span>
+      </td>
+      <td>
+        <span>{{ pak.Items}}</span>
+      </td>
+      <td>
+        <span>{{ pak.SKU}}</span>
+      </td>
+    </tr>
+    <tr *ngIf="splitTotal.length === 0">
+      <td colspan='6'>
+        <span>No Information Available</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <ngx-spinner id="pageSpinner" #pageSpinner bdOpacity=0.9 bdColor="" size="medium" color="#f30808" type="ball-running-dots" fullScreen="false">
+    <h1 style="color: white; background-color: darkgray;"> Loading... </h1>
+  </ngx-spinner>
 
   </div>
 </ng-template>
 
-<ngx-spinner bdOpacity=0.9 bdColor="" size="medium" color="#f30808" type="ball-running-dots" fullScreen="false">
+<ngx-spinner id="pageSpinner" #pageSpinner bdOpacity=0.9 bdColor="" size="medium" color="#f30808" type="ball-running-dots" fullScreen="false">
   <h1 style="color: white; background-color: darkgray;"> Loading... </h1>
 </ngx-spinner>
