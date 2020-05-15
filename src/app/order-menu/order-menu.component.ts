@@ -236,7 +236,7 @@ export class OrderMenuComponent implements OnInit {
 
     if (this.outstanding) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
-        return fullText.FoldStatus !== 'Fulfilled';
+        return fullText.FoldStatus !== 'VOIDED' && fullText.FoldStatus !== 'CLOSED';
       });
     }
   }

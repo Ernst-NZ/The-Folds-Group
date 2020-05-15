@@ -74,7 +74,7 @@
             <button *ngIf='!pak.FoldStatus && (pak.FoldStore === "NO SKU" || pak.FoldStore === "Multiple Stores" )'
               class="btn btn-danger btn-small btn-block" (click)="getOrder(pak.OrderId)"
               style='text-align: left;'>#{{ pak.OrderNumber }}</button>
-            <button *ngIf='pak.FoldStatus === "Fulfilled"' class="btn btn-success btn-small btn-block"
+            <button *ngIf='pak.FoldStatus === "VOIDED" || pak.FoldStatus === "CLOSED"' class="btn btn-success btn-small btn-block"
               (click)="getOrder(pak.OrderId)" style='text-align: left;'>#{{ pak.OrderNumber }}</button>
           </td>
           <td>
@@ -90,10 +90,10 @@
             <button *ngIf='!pak.FoldStatus && (pak.FoldStore !== "NO SKU" && pak.FoldStore !== "Multiple Stores" )'
               class="btn btn-warning btn-small btn-block" (click)="openComments(comments, pak)"
               style='text-align: left;'>{{ pak.FoldStore }}</button>
-            <button *ngIf='!pak.FoldStatus && (pak.FoldStore === "NO SKU" || pak.FoldStore === "Multiple Stores" )'
+            <button *ngIf='(pak.FoldStore === "NO SKU" || pak.FoldStore === "Multiple Stores" )'
               class="btn btn-danger btn-small btn-block" (click)="openComments(comments, pak)"
               style='text-align: left;'>{{ pak.FoldStore }}</button>
-            <button *ngIf='pak.FoldStatus === "Fulfilled"' class="btn btn-success btn-small btn-block"
+            <button *ngIf='(pak.FoldStatus === "VOIDED" || pak.FoldStatus === "CLOSED") && pak.FoldStore !== "Multiple Stores"' class="btn btn-success btn-small btn-block"
               (click)="openComments(comments, pak)" style='text-align: left;'>{{ pak.FoldStore }}</button>
           </td>
           <td *ngIf="!(isHandset$ | async)">
