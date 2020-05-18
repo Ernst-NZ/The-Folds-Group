@@ -52,6 +52,8 @@ export class OrderMenuComponent implements OnInit {
   OrderId: string;
   Allocated = false;
   OrderItemTotal: number;
+  VendMaster: any;
+  VendProducts: any;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -191,27 +193,27 @@ export class OrderMenuComponent implements OnInit {
   getStore() {
     if (this.MultiOrders) {
       for (let n = 0; n < this.MultiOrders.length; n++) {
-        const ordered = this.MultiOrders[n]['ItemId'];
+        const ordered = this.MultiOrders[n].ItemId;
         this.captures = [];
-        if (this.MultiOrders[n]['Brooklyn'] >= ordered && this.MultiOrders[n]['ItemSKU'] !== 'Total') {
-          const temp = this.StoreList('Brooklyn', this.MultiOrders[n]['Brooklyn'], this.MultiOrders[n]['ItemSKU']);
-          this.MultiOrders[n]['Store'] = temp;
+        if (this.MultiOrders[n].Brooklyn >= ordered && this.MultiOrders[n].ItemSKU !== 'Total') {
+          const temp = this.StoreList('Brooklyn', this.MultiOrders[n].Brooklyn, this.MultiOrders[n].ItemSKU);
+          this.MultiOrders[n].Store = temp;
         }
-        if (this.MultiOrders[n]['GoodLad'] >= ordered) {
-          const temp = this.StoreList('GoodLad', this.MultiOrders[n]['GoodLad'], this.MultiOrders[n]['ItemSKU']);
-          this.MultiOrders[n]['Store'] = temp;
+        if (this.MultiOrders[n].GoodLad >= ordered) {
+          const temp = this.StoreList('GoodLad', this.MultiOrders[n].GoodLad, this.MultiOrders[n].ItemSKU);
+          this.MultiOrders[n].Store = temp;
         }
-        if (this.MultiOrders[n]['Howard'] >= ordered) {
-          const temp = this.StoreList('Howard', this.MultiOrders[n]['Howard'], this.MultiOrders[n]['ItemSKU']);
-          this.MultiOrders[n]['Store'] = temp;
+        if (this.MultiOrders[n].Howard >= ordered) {
+          const temp = this.StoreList('Howard', this.MultiOrders[n].Howard, this.MultiOrders[n].ItemSKU);
+          this.MultiOrders[n].Store = temp;
         }
-        if (this.MultiOrders[n]['West'] >= ordered) {
-          const temp = this.StoreList('West', this.MultiOrders[n]['West'], this.MultiOrders[n]['ItemSKU']);
-          this.MultiOrders[n]['Store'] = temp;
+        if (this.MultiOrders[n].West >= ordered) {
+          const temp = this.StoreList('West', this.MultiOrders[n].West, this.MultiOrders[n].ItemSKU);
+          this.MultiOrders[n].Store = temp;
         }
         if (this.captures.length < 1) {
-          const temp = this.StoreList('Available', 0, this.MultiOrders[n]['ItemSKU']);
-          this.MultiOrders[n]['Store'] = temp;
+          const temp = this.StoreList('Available', 0, this.MultiOrders[n].ItemSKU);
+          this.MultiOrders[n].Store = temp;
         }
       }
     }
@@ -248,7 +250,8 @@ export class OrderMenuComponent implements OnInit {
   }
 
   openComments(comments, i: any, ) {
-    console.log(i);
+    this.splitTotal = [];
+    this.tempSplit = [];
     this.OrderItemTotal = i.OrderItemTotal;
     this.OrderNo = i.OrderNumber;
     this.OrderId = i.OrderId;
@@ -301,10 +304,10 @@ export class OrderMenuComponent implements OnInit {
     if (this.splitTotal.find(s => s.Store === store)) {
       let i = 0;
       let stores = 0;
-      for (i = 0 , stores = this.splitTotal.length; i < stores; i++) {
-        if (this.splitTotal[i]['Store'] === store) {
-          this.splitTotal[i]['Items'] = +this.splitTotal[i]['Items'] + 1;
-          this.splitTotal[i]['SKU'] = this.splitTotal[i]['SKU'].concat(', ', sku);
+      for (i = 0, stores = this.splitTotal.length; i < stores; i++) {
+        if (this.splitTotal[i].Store === store) {
+          this.splitTotal[i].Items = +this.splitTotal[i].Items + 1;
+          this.splitTotal[i].SKU = this.splitTotal[i].SKU.concat(', ', sku);
         }
       }
     } else {
@@ -320,19 +323,19 @@ export class OrderMenuComponent implements OnInit {
 
   // get the list of registers and SKU numbers
   StoreSplit(store: string, sku: string) {
-    const n = store.indexOf( '-' ) + 2;
+    const n = store.indexOf('-') + 2;
     store = store.substring(n);
     if (this.tempSplit.find(s => s.SKU === sku)) {
       let i = 0;
       let stores = 0;
-      for (i = 0 , stores = this.tempSplit.length; i < stores; i++) {
-        if (this.tempSplit[i]['SKU'] === sku) {
-          this.tempSplit[i]['Store'] = store;
+      for (i = 0, stores = this.tempSplit.length; i < stores; i++) {
+        if (this.tempSplit[i].SKU === sku) {
+          this.tempSplit[i].Store = store;
         }
       }
       this.splitTotal = [];
-      for (i = 0 , stores = this.tempSplit.length; i < stores; i++) {
-        this.getSplitTotals(this.tempSplit[i]['Store'], this.tempSplit[i]['SKU']);
+      for (i = 0, stores = this.tempSplit.length; i < stores; i++) {
+        this.getSplitTotals(this.tempSplit[i].Store, this.tempSplit[i].SKU);
       }
     } else {
       this.tempSplit.push({
@@ -382,6 +385,73 @@ export class OrderMenuComponent implements OnInit {
           this.spinner.hide();
         });
   }
-  test() { }
+  test1() {
+    this.service.CTGetVendOrder(this.OrderNo)
+      .subscribe((cat: any) => {
+        (this.VendMaster = cat);
+        this.VendProducts = this.VendMaster.register_sale_products;
+        let currentRegister: string;
+        let currentProds = [];
+        for (let n = 0; n < this.splitTotal.length; n++) {
+          currentRegister = this.splitTotal[n]['Store'];
+          currentProds = this.splitTotal[n]['SKU'];
+          console.log('New Order', currentRegister, currentProds);
+          this.splitOrder(currentRegister, currentProds);
+        }
+
+        this.spinner.hide();
+      },
+        (err) => {
+          console.log(err);
+          this.spinner.hide();
+        });
+  }
+
+  splitOrder(register: string, prods: any) {
+    const products = this.VendProducts;
+    console.log(this.VendMaster);
+    console.log(products);
+    for (let n = 0; n < products.length; n++) {
+      const substrings = prods.split(', ');
+      for (let i = 0; i < products.length; i++) {
+        const str = products[i].sku;
+        if (new RegExp(substrings.join('|')).test(str)) {
+          console.log('Match using \'' + str + '\'');
+        } else {
+          console.log('No match using \'' + str + '\'');
+          products.splice(i, 1, {
+          });
+        }
+      }
+      console.log(register, products);
+    }
+  }
+
+  test() {
+    let dd = 0;
+    this.service.CTGetVendOrder(this.OrderNo)
+      .subscribe((cat: any) => {
+        (this.VendMaster = cat);
+        const products = this.VendMaster.register_sale_products;
+        console.log(this.VendMaster.register_sale_products);
+
+        for (let n = 0; n < products.length; n++) {
+          if (products[n].sku === '38703-S') {
+            products.splice(n, 1, {
+            });
+            dd = n;
+          }
+        }
+        delete products[dd];
+        console.log(products);
+        console.log(this.VendMaster);
+        this.spinner.hide();
+      },
+        (err) => {
+          console.log(err);
+          this.spinner.hide();
+        });
+  }
+
 
 }
