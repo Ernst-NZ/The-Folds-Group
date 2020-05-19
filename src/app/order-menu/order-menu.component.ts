@@ -53,7 +53,9 @@ export class OrderMenuComponent implements OnInit {
   Allocated = false;
   OrderItemTotal: number;
   VendMaster: any;
+  VendTemp: any;
   VendProducts: any;
+  ReadyForPost = false;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -251,6 +253,7 @@ export class OrderMenuComponent implements OnInit {
 
   openComments(comments, i: any, ) {
     this.splitTotal = [];
+    this.ReadyForPost = false;
     this.tempSplit = [];
     this.OrderItemTotal = i.OrderItemTotal;
     this.OrderNo = i.OrderNumber;
@@ -317,8 +320,6 @@ export class OrderMenuComponent implements OnInit {
         SKU: sku,
       });
     }
-
-
   }
 
   // get the list of registers and SKU numbers
@@ -334,6 +335,7 @@ export class OrderMenuComponent implements OnInit {
         }
       }
       this.splitTotal = [];
+      this.ReadyForPost = false;
       for (i = 0, stores = this.tempSplit.length; i < stores; i++) {
         this.getSplitTotals(this.tempSplit[i].Store, this.tempSplit[i].SKU);
       }
@@ -378,27 +380,47 @@ export class OrderMenuComponent implements OnInit {
         orderAddress = orderAddress.concat(VendId);
         window.open(orderAddress, '_blank');
         //    https://thefold.vendhq.com/history#59423c0f-8e53-b7a4-11ea-94a123b534f8
-
       },
         (err) => {
           console.log(err);
           this.spinner.hide();
         });
   }
-  test1() {
-    this.service.CTGetVendOrder(this.OrderNo)
+
+
+  testSingle(targetStore: string) {
+    // Get the current Order
+    // Loop through the Total table
+    // Total table has the products by Store
+    // Grab the firts store
+    // Loop through the Order and remove Products that is not linked to the specific store
+  //  targetStore = 'Brooklyn';
+  let i = 0;
+  let stores = 0;
+  this.service.CTGetVendOrder(this.OrderNo)
       .subscribe((cat: any) => {
-        (this.VendMaster = cat);
+        this.VendMaster = cat;
         this.VendProducts = this.VendMaster.register_sale_products;
         let currentRegister: string;
         let currentProds = [];
         for (let n = 0; n < this.splitTotal.length; n++) {
-          currentRegister = this.splitTotal[n]['Store'];
-          currentProds = this.splitTotal[n]['SKU'];
-          console.log('New Order', currentRegister, currentProds);
-          this.splitOrder(currentRegister, currentProds);
+          this.VendTemp = this.VendMaster;
+          currentRegister = this.splitTotal[n].Store;
+          currentProds = this.splitTotal[n].SKU;
+          if (this.splitTotal[n].Store === targetStore) {
+            console.log('New Order', currentRegister, currentProds);
+            this.splitOrder(currentRegister, currentProds);
+            for (i = 0, stores = this.splitTotal.length; i < stores; i++) {
+              if (this.splitTotal[i].Store === targetStore) {
+                this.splitTotal[i].Processed = 'Checked';
+                this.splitTotal[i].NewOrder = this.VendTemp;
+              }
+            }
+          }
         }
-
+        console.log(this.splitTotal);
+        this.checkForPost();
+        console.log('after check', this.ReadyForPost);
         this.spinner.hide();
       },
         (err) => {
@@ -408,50 +430,35 @@ export class OrderMenuComponent implements OnInit {
   }
 
   splitOrder(register: string, prods: any) {
-    const products = this.VendProducts;
-    console.log(this.VendMaster);
-    console.log(products);
+    prods = prods.concat(', ', 'FreeStandardShippingPromo');
+    const products = this.VendTemp.register_sale_products;
     for (let n = 0; n < products.length; n++) {
       const substrings = prods.split(', ');
-      for (let i = 0; i < products.length; i++) {
-        const str = products[i].sku;
-        if (new RegExp(substrings.join('|')).test(str)) {
-          console.log('Match using \'' + str + '\'');
-        } else {
-          console.log('No match using \'' + str + '\'');
-          products.splice(i, 1, {
-          });
-        }
+      const str = products[n].sku;
+      if (new RegExp(substrings.join('|')).test(str)) {
+        //  console.log('Match using \'' + str + '\'');
+      } else {
+        console.log('No match using \'' + str + '\'' + n);
+        this.VendTemp.register_sale_products.splice(n, 1, {
+        });
+        // console.log(n, this.VendTemp);
       }
-      console.log(register, products);
+    }
+    return products;
+  }
+
+  checkForPost() {
+    for (let n = 0; n < this.splitTotal.length; n++) {
+      this.ReadyForPost = true;
+      if (!this.splitTotal[n].Processed) {
+        this.ReadyForPost = false;
+        console.log('in check', this.ReadyForPost);
+      }
     }
   }
 
-  test() {
-    let dd = 0;
-    this.service.CTGetVendOrder(this.OrderNo)
-      .subscribe((cat: any) => {
-        (this.VendMaster = cat);
-        const products = this.VendMaster.register_sale_products;
-        console.log(this.VendMaster.register_sale_products);
+  splitOrders() {
 
-        for (let n = 0; n < products.length; n++) {
-          if (products[n].sku === '38703-S') {
-            products.splice(n, 1, {
-            });
-            dd = n;
-          }
-        }
-        delete products[dd];
-        console.log(products);
-        console.log(this.VendMaster);
-        this.spinner.hide();
-      },
-        (err) => {
-          console.log(err);
-          this.spinner.hide();
-        });
   }
-
 
 }
