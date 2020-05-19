@@ -130,7 +130,7 @@
   </div>
   <div class="modal-body appBackGround">
     <div *ngIf='this.Allocated === true'>
-      <h3> - To Do - <br>Order has been allocated but not dispatched</h3>
+      <!-- <h3> - To Do - <br>Order has been allocated but not dispatched</h3> -->
     </div>
     <div>
       <button class="btn btn-info btn-small btn-block center"
@@ -171,9 +171,9 @@
         </td>
       </tr>
       <tr>
-        <td colspan="3">
-          <button *ngIf='this.tempSplit.length === OrderItemTotal' class="btn btn-info btn-small"
-              (click)="test()" style='text-align: left;'>Proses Orders</button>
+        <td colspan="3" style="text-align: center;">
+          <button *ngIf='this.tempSplit.length === OrderItemTotal && ReadyForPost' class="btn btn-success btn-small"
+              (click)="splitOrders()" style='text-align: center;'>Proses Orders</button>
         </td>
       </tr>
       <tr *ngIf="MultiOrders.length === 0">
@@ -190,6 +190,7 @@
       <th (click)="sort('Store')">Store</th>
       <th (click)="sort('Items')">Items</th>
       <th (click)="sort('Items')">SKU Numbers</th>
+      <th (click)="sort('Items')">Process Order</th>
     </tr>
   </thead>
   <tbody>
@@ -202,6 +203,11 @@
       </td>
       <td>
         <span>{{ pak.SKU}}</span>
+      </td>
+      <td>
+        <button *ngIf='this.tempSplit.length === OrderItemTotal && !pak.Processed' class="btn btn-info btn-small"
+              (click)="testSingle(pak.Store)" style='text-align: left;'>Confirm Order</button>
+        <span *ngIf='pak.Processed'>{{ pak.Processed }}</span>
       </td>
     </tr>
     <tr *ngIf="splitTotal.length === 0">
