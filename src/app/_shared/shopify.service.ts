@@ -30,7 +30,6 @@ export class ShopifyService {
   }
 
   getTest(endPoint: string): Observable<any> {
-    console.log(2);
     return this.http.get<any>(this.rootURL + '/shopOrders/');
   }
 
@@ -61,5 +60,14 @@ export class ShopifyService {
   CTGetVendOrder(OrderID: string): Observable<string> {
     console.log('Get VendId', OrderID);
     return this.http.get<string>(this.rootURL + '/GetVendOrder/' + OrderID);
+  }
+
+  CTUpdateVendOrder(orderNo: string, splitTotal: any) {
+    console.log('update Vend', splitTotal);
+    return this.http.put(this.rootURL + '/VendUpdates/' + orderNo, splitTotal);
+  }
+
+  putxxx(formRole: any) {
+    return this.http.post(this.rootURL + '/roles/' + formRole.Id, formRole);
   }
 }

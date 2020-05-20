@@ -49,15 +49,12 @@ export class SignInComponent implements OnInit {
     this.btnText = 'Processing';
     this.syncing = true;
     this.spinner.show();
-    console.log('start');
     this.userService.userAuthentication(userName, password).subscribe((data: any) => {
-      console.log('login data', data);
       this.globals.loginUser = true;
       localStorage.setItem('userToken', data.access_token);
       localStorage.setItem('userCode', userName);
       this.globals.userCode = userName;
       this.userService.SPGetUserInfo(userName).subscribe((info: any) => {
-        console.log(info);
         localStorage.setItem('firstName', info[0].FirstName);
         this.globals.FirstName = info[0].FirstName;
       });
@@ -84,7 +81,6 @@ export class SignInComponent implements OnInit {
     });
     this.userService.forgotPassword(this.tempEmail[0]).subscribe(
       (data: any) => {
-        console.log(data);
         this.spinner.hide();
         this.toastr.success('An email has been sent to your inbox.');
         this.btnText = 'Success';

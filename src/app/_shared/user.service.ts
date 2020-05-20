@@ -39,7 +39,6 @@ export class UserService {
       'Content-Type': 'application/x-www-urlencoded',
       'No-Auth': 'True'
     });
-    console.log(this.rootURL, data, reqHeader)
     return this.http.post(this.rootURL + '/token', data, {
       headers: reqHeader
     });
@@ -61,7 +60,6 @@ export class UserService {
 
 
   resetPassword(emailData) {
-    console.log('Reset Password', emailData);
     const reqHeader = new HttpHeaders({
       'No-Auth': 'True'
     });
@@ -71,7 +69,6 @@ export class UserService {
   }
 
   changePassword(resetData) {
-    console.log('Change Password', resetData);
     const reqHeader = new HttpHeaders({
       'No-Auth': 'True'
     });
@@ -82,7 +79,6 @@ export class UserService {
 
 
   registerNewUser(user: any) {
-    console.log('user', user);
     const reqHeader = new HttpHeaders({
       'No-Auth': 'True',
       'Access-Control-Allow-Origin': '*'
