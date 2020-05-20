@@ -44,6 +44,7 @@ export class OrderMenuComponent implements OnInit {
   tempSplit: any[] = [];
   splitTotal: any[] = [];
   captures: any[] = [];
+  newFold: any[] = [];
   searchText = '';
   tempDate: number;
   MultiOrders: any;
@@ -116,12 +117,13 @@ export class OrderMenuComponent implements OnInit {
           -1 ||
           fullText.FoldStore.toLowerCase().indexOf(data.toLowerCase()) > -1
           ||
-          fullText.OrderTotal.toString().toLowerCase().indexOf(data.toLowerCase()) > -1
+          fullText.OrderTotal.toString().toLowerCase().indexOf(data.toLowerCase()) > -1 ||
+          fullText.FoldComments.toLowerCase().indexOf(data.toLowerCase()) > -1
         );
       });
     } else {
       this.filteredText = this.orderList;
-      //     this.LineText = this.fullText;
+      //     this.LineText = this.fullText;  FoldComments
     }
   }
 
@@ -369,12 +371,12 @@ export class OrderMenuComponent implements OnInit {
   }
 
   openVend() {
+    this.spinner.show();
     let VendId: string;
-    console.log(this.OrderNo);
     this.service.CTGetVendID(this.OrderNo)
       .subscribe((cat: any) => {
         (VendId = cat);
-        console.log(VendId, cat);
+        console.log(VendId);
         this.spinner.hide();
         let orderAddress = 'https://thefold.vendhq.com/history#';
         orderAddress = orderAddress.concat(VendId);
@@ -395,10 +397,13 @@ export class OrderMenuComponent implements OnInit {
     // Grab the firts store
     // Loop through the Order and remove Products that is not linked to the specific store
   //  targetStore = 'Brooklyn';
+  this.spinner.show();
   let i = 0;
   let stores = 0;
   this.service.CTGetVendOrder(this.OrderNo)
       .subscribe((cat: any) => {
+        console.log(cat);
+      //  return;
         this.VendMaster = cat;
         this.VendProducts = this.VendMaster.register_sale_products;
         let currentRegister: string;
@@ -408,7 +413,6 @@ export class OrderMenuComponent implements OnInit {
           currentRegister = this.splitTotal[n].Store;
           currentProds = this.splitTotal[n].SKU;
           if (this.splitTotal[n].Store === targetStore) {
-            console.log('New Order', currentRegister, currentProds);
             this.splitOrder(currentRegister, currentProds);
             for (i = 0, stores = this.splitTotal.length; i < stores; i++) {
               if (this.splitTotal[i].Store === targetStore) {
@@ -418,9 +422,7 @@ export class OrderMenuComponent implements OnInit {
             }
           }
         }
-        console.log(this.splitTotal);
         this.checkForPost();
-        console.log('after check', this.ReadyForPost);
         this.spinner.hide();
       },
         (err) => {
@@ -430,21 +432,61 @@ export class OrderMenuComponent implements OnInit {
   }
 
   splitOrder(register: string, prods: any) {
+    this.spinner.show();
     prods = prods.concat(', ', 'FreeStandardShippingPromo');
     const products = this.VendTemp.register_sale_products;
+    let orderCost = 0;
+    let orderPrice = 0;
+    let orderTax = 0;
     for (let n = 0; n < products.length; n++) {
       const substrings = prods.split(', ');
       const str = products[n].sku;
       if (new RegExp(substrings.join('|')).test(str)) {
+        orderCost = orderCost + products[n].cost;
+        orderPrice = orderPrice + products[n].price_total;
+        orderTax = orderTax + products[n].tax_total;
         //  console.log('Match using \'' + str + '\'');
       } else {
-        console.log('No match using \'' + str + '\'' + n);
+     //   console.log('No match using \'' + str + '\'' + n);
         this.VendTemp.register_sale_products.splice(n, 1, {
         });
         // console.log(n, this.VendTemp);
       }
     }
-    return products;
+    switch (register) {
+      case 'Brooklyn': {
+        this.VendTemp.register_id = this.globals.BrookLyn;
+        break;
+      }
+      case 'GoodLad': {
+        this.VendTemp.register_id = this.globals.GoodLad;
+        break;
+      }
+      case 'Howard': {
+        this.VendTemp.register_id = this.globals.Howard;
+        break;
+      }
+      case 'West': {
+        this.VendTemp.register_id = this.globals.West;
+        break;
+      }
+      default: {
+        this.VendTemp.register_id = this.globals.BrookLyn;
+        break;
+      }
+   }
+    this.VendTemp.user_id = '06c2f1bf-e94b-11ea-efcf-004371e2252e';
+    this.VendTemp.user_name = 'Jacob Visser';
+    this.VendTemp.register_sale_payments[0].amount = 999;
+    this.VendTemp.total_cost = orderCost;
+    this.VendTemp.total_price = 999;
+    this.VendTemp.total_tax = orderTax;
+    this.VendTemp.totals.total_payment = 999;
+    this.VendTemp.totals.total_price = 999;
+    this.VendTemp.totals.total_tax = orderTax;
+
+    this.spinner.hide();
+    // return products;
   }
 
   checkForPost() {
@@ -452,13 +494,47 @@ export class OrderMenuComponent implements OnInit {
       this.ReadyForPost = true;
       if (!this.splitTotal[n].Processed) {
         this.ReadyForPost = false;
-        console.log('in check', this.ReadyForPost);
       }
     }
   }
 
   splitOrders() {
+    this.spinner.show();
+    console.log(this.splitTotal);
+    let currentRegister: string;
+    let prods: any;
+    for (let order of this.splitTotal) {
+      currentRegister = order.Store;
+      this.service.CTUpdateVendOrder(this.OrderNo, this.splitTotal)
+      .subscribe((cat: any) => {
+        console.log(cat);
+        this.spinner.hide();
+      },
+        (err) => {
+          console.log(err);
+          this.spinner.hide();
+        });
+      console.log(order.SKU);
 
+    }
+
+
+
+    // this.newFold.push({
+    //   OrderId: this.OrderId,
+    //   FoldStore: 'Chekkers',
+    //   FoldComments: 'Some comments',
+    // });
+    // this.service.CTUpdateVendOrder(this.OrderNo, SKU, this.newFold)
+    //   .subscribe((cat: any) => {
+    //     console.log(cat);
+    //     this.spinner.hide();
+    //   },
+    //     (err) => {
+    //       console.log(err);
+    //       this.spinner.hide();
+    //     });
+    this.spinner.hide();
   }
 
 }

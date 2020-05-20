@@ -41,8 +41,6 @@ export class SatsService {
     this.http
       .get(this.rootURL + '/SPGetSOP/' + 'DEMO')
       .subscribe((resSP: any[]) => {
-        console.log('5');
-        console.log(resSP, 'info in service');
         return resSP;
       });
   }
