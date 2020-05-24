@@ -11,6 +11,7 @@ import { SorterService } from '../_shared/sorter.service';
 import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { shareReplay, map } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-order-menu',
@@ -57,6 +58,9 @@ export class OrderMenuComponent implements OnInit {
   VendTemp: any;
   VendProducts: any;
   ReadyForPost = false;
+  orderCost = 0;
+  orderPrice = 0;
+  orderTax = 0;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -66,6 +70,7 @@ export class OrderMenuComponent implements OnInit {
     private calendar: NgbCalendar,
     private modalService: NgbModal,
     private sorterService: SorterService,
+    private http: HttpClient,
   ) {
     this.service = service;
   }
@@ -242,7 +247,7 @@ export class OrderMenuComponent implements OnInit {
 
     if (this.outstanding) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
-        return fullText.FoldStatus !== 'VOIDED' && fullText.FoldStatus !== 'CLOSED';
+        return fullText.FoldStore === 'Multiple Stores';
       });
     }
   }
@@ -266,9 +271,9 @@ export class OrderMenuComponent implements OnInit {
       this.Allocated = false;
     }
     this.FoldComments = i.FoldComments;
-    if (i.FoldStore === 'NO SKU' || i.FoldStore === 'Multiple Stores') {
-      this.spinner.show();
-      this.service.CTGetMultiOrders_Static(i.OrderNumber)
+//    if (i.FoldStore === 'NO SKU' || i.FoldStore === 'Multiple Stores') {
+    this.spinner.show();
+    this.service.CTGetMultiOrders_Static(i.OrderNumber)
         .subscribe((cat: any) => {
           (this.MultiOrders = cat);
           this.getStore();
@@ -278,7 +283,7 @@ export class OrderMenuComponent implements OnInit {
             console.log(err);
             this.spinner.hide();
           });
-    }
+  //  }
     this.modalService
       .open(comments, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
@@ -312,14 +317,18 @@ export class OrderMenuComponent implements OnInit {
       for (i = 0, stores = this.splitTotal.length; i < stores; i++) {
         if (this.splitTotal[i].Store === store) {
           this.splitTotal[i].Items = +this.splitTotal[i].Items + 1;
-          this.splitTotal[i].SKU = this.splitTotal[i].SKU.concat(', ', sku);
+          this.splitTotal[i].SKUList = this.splitTotal[i].SKUList.concat(', ', sku);
         }
       }
     } else {
       this.splitTotal.push({
         Store: store,
         Items: 1,
-        SKU: sku,
+        SKUList: sku,
+        orderCost: this.orderCost,
+        orderPrice: this.orderPrice,
+        orderTax: this.orderTax,
+        OrderId: '',
       });
     }
   }
@@ -351,7 +360,7 @@ export class OrderMenuComponent implements OnInit {
   }
 
   onProdSelect(args) {
-    if (args.target.value !== '0') {
+    if (args.target.value !== 0 && !this.Allocated && args.target.options[args.target.selectedIndex].text !== '0 - Available') {
       this.StoreSplit(args.target.options[args.target.selectedIndex].text, args.target.value);
     }
   }
@@ -402,7 +411,6 @@ export class OrderMenuComponent implements OnInit {
   let stores = 0;
   this.service.CTGetVendOrder(this.OrderNo)
       .subscribe((cat: any) => {
-        console.log(cat);
       //  return;
         this.VendMaster = cat;
         this.VendProducts = this.VendMaster.register_sale_products;
@@ -411,15 +419,24 @@ export class OrderMenuComponent implements OnInit {
         for (let n = 0; n < this.splitTotal.length; n++) {
           this.VendTemp = this.VendMaster;
           currentRegister = this.splitTotal[n].Store;
-          currentProds = this.splitTotal[n].SKU;
+          currentProds = this.splitTotal[n].SKUList;
           if (this.splitTotal[n].Store === targetStore) {
             this.splitOrder(currentRegister, currentProds);
             for (i = 0, stores = this.splitTotal.length; i < stores; i++) {
               if (this.splitTotal[i].Store === targetStore) {
                 this.splitTotal[i].Processed = 'Checked';
                 this.splitTotal[i].NewOrder = this.VendTemp;
+                this.splitTotal[i].orderId = this.VendMaster.id;
+                this.splitTotal[i].orderCost = this.orderCost;
+                this.splitTotal[i].orderPrice = this.orderPrice;
+                this.splitTotal[i].orderTax = this.orderTax;
               }
             }
+            this.splitTotal[n].orderId = this.VendMaster.id;
+            this.splitTotal[n].orderCost = this.orderCost;
+            this.splitTotal[n].orderPrice = this.orderPrice;
+            this.splitTotal[n].orderTax = this.orderTax;
+            this.splitTotal[n].SKUList = this.splitTotal[n].SKUList.concat(', ', 'FreeStandardShippingPromo');
           }
         }
         this.checkForPost();
@@ -435,64 +452,69 @@ export class OrderMenuComponent implements OnInit {
     this.spinner.show();
     prods = prods.concat(', ', 'FreeStandardShippingPromo');
     const products = this.VendTemp.register_sale_products;
-    let orderCost = 0;
-    let orderPrice = 0;
-    let orderTax = 0;
     for (let n = 0; n < products.length; n++) {
       const substrings = prods.split(', ');
       const str = products[n].sku;
       if (new RegExp(substrings.join('|')).test(str)) {
-        orderCost = orderCost + products[n].cost;
-        orderPrice = orderPrice + products[n].price_total;
-        orderTax = orderTax + products[n].tax_total;
-        //  console.log('Match using \'' + str + '\'');
+        // console.log(products[n]);
+        // console.log(products[n].cost);
+        this.orderCost = this.orderCost + products[n].cost;
+        this.orderPrice = this.orderPrice + products[n].price_total;
+        this.orderTax = this.orderTax + products[n].tax_total;
       } else {
-     //   console.log('No match using \'' + str + '\'' + n);
         this.VendTemp.register_sale_products.splice(n, 1, {
         });
-        // console.log(n, this.VendTemp);
       }
     }
     switch (register) {
       case 'Brooklyn': {
         this.VendTemp.register_id = this.globals.BrookLyn;
+        this.VendTemp.user_id = '069db350-8d4b-11ea-f6a9-88b84379ba3d';
+        this.VendTemp.user_name = 'WEB B';
         break;
       }
       case 'GoodLad': {
         this.VendTemp.register_id = this.globals.GoodLad;
+        this.VendTemp.user_id = '069db350-8d4b-11ea-f6a9-84dd2bd26074';
+        this.VendTemp.user_name = 'WEBG';
         break;
       }
       case 'Howard': {
         this.VendTemp.register_id = this.globals.Howard;
+        this.VendTemp.user_id = '069db350-8d4b-11ea-f6a9-84dbb4b256b6';
+        this.VendTemp.user_name = 'WEB H';
         break;
       }
       case 'West': {
         this.VendTemp.register_id = this.globals.West;
+        this.VendTemp.user_id = '069db350-8d4b-11ea-f6a9-8363ac0c55cf';
+        this.VendTemp.user_name = 'WEB W';
         break;
       }
       default: {
         this.VendTemp.register_id = this.globals.BrookLyn;
+        this.VendTemp.user_id = '069db350-8d4b-11ea-f6a9-88b84379ba3d';
+        this.VendTemp.user_name = 'WEB B';
         break;
       }
    }
-    this.VendTemp.user_id = '06c2f1bf-e94b-11ea-efcf-004371e2252e';
-    this.VendTemp.user_name = 'Jacob Visser';
-    this.VendTemp.register_sale_payments[0].amount = 999;
-    this.VendTemp.total_cost = orderCost;
-    this.VendTemp.total_price = 999;
-    this.VendTemp.total_tax = orderTax;
-    this.VendTemp.totals.total_payment = 999;
-    this.VendTemp.totals.total_price = 999;
-    this.VendTemp.totals.total_tax = orderTax;
+   // this.VendTemp.id = '';
+    this.VendTemp.register_sale_payments[0].amount = this.orderPrice;
+    this.VendTemp.total_cost = this.orderCost;
+    this.VendTemp.total_price = this.orderPrice;
+    this.VendTemp.total_tax = this.orderTax;
+    this.VendTemp.totals.total_payment = this.orderPrice + this.orderTax;
+    this.VendTemp.totals.total_price = this.orderPrice;
+    this.VendTemp.totals.total_tax = this.orderTax;
 
     this.spinner.hide();
     // return products;
   }
 
   checkForPost() {
-    for (let n = 0; n < this.splitTotal.length; n++) {
+    for (const order of this.splitTotal) {
       this.ReadyForPost = true;
-      if (!this.splitTotal[n].Processed) {
+      if (!order.Processed) {
         this.ReadyForPost = false;
       }
     }
@@ -500,41 +522,42 @@ export class OrderMenuComponent implements OnInit {
 
   splitOrders() {
     this.spinner.show();
+    for (let n = 0; n < this.splitTotal.length; n++) {
+      this.VendMaster.note = 'Order_Test_Shopify';
+    }
     console.log(this.splitTotal);
-    let currentRegister: string;
-    let prods: any;
-    for (let order of this.splitTotal) {
-      currentRegister = order.Store;
-      this.service.CTUpdateVendOrder(this.OrderNo, this.splitTotal)
+    this.service.CTUpdateVendOrder(this.OrderNo, this.splitTotal)
       .subscribe((cat: any) => {
         console.log(cat);
+        this.refresh();
         this.spinner.hide();
       },
         (err) => {
           console.log(err);
           this.spinner.hide();
         });
-      console.log(order.SKU);
-
-    }
-
-
-
-    // this.newFold.push({
-    //   OrderId: this.OrderId,
-    //   FoldStore: 'Chekkers',
-    //   FoldComments: 'Some comments',
-    // });
-    // this.service.CTUpdateVendOrder(this.OrderNo, SKU, this.newFold)
-    //   .subscribe((cat: any) => {
-    //     console.log(cat);
-    //     this.spinner.hide();
-    //   },
-    //     (err) => {
-    //       console.log(err);
-    //       this.spinner.hide();
-    //     });
-    this.spinner.hide();
+//    this.spinner.hide();
   }
 
+  refresh() {
+    this.spinner.show();
+    this.service.getorders()
+    .subscribe((cat: any[]) => {
+      this.service.SPGetOrders()
+        .subscribe((cat: IShopOrders[]) => {
+          (this.orderList = cat);
+          this.filteredText = this.orderList;
+          this.preFilter();
+          this.spinner.hide();
+        },
+          (err) => {
+            console.log(err);
+            this.spinner.hide();
+          });
+    },
+      (err) => {
+        console.log('##### ERROR', err);
+        this.spinner.hide();
+      });
+  }
 }
