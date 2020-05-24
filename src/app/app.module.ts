@@ -40,6 +40,7 @@ import { MenuBlankComponent } from './menu/menu-blank/menu-blank.component';
 import { MenuAuthComponent } from './menu/menu-auth/menu-auth.component';
 import { OrderMenuComponent } from './order-menu/order-menu.component';
 import { MyTestComponent } from './my-test/my-test.component';
+import { ReportComponent } from './report/report.component';
 
 
 @NgModule({
@@ -55,7 +56,8 @@ import { MyTestComponent } from './my-test/my-test.component';
     MenuBlankComponent,
     MenuAuthComponent,
     OrderMenuComponent,
-    MyTestComponent
+    MyTestComponent,
+    ReportComponent
   ],
   imports: [
     BrowserModule,

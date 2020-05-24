@@ -7,7 +7,7 @@ import { SignInComponent } from './sign-in/sign-in.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { OrderMenuComponent } from './order-menu/order-menu.component';
 import { MyTestComponent } from './my-test/my-test.component';
-
+import { ReportComponent } from './report/report.component';
 
 const routes: Routes = [
   { path: 'auth', component: AuthComponent},
@@ -15,6 +15,7 @@ const routes: Routes = [
   { path: 'login', component: SignInComponent},
   { path: 'menu', component: MenuComponent},
   { path: 'orderMenu', component: OrderMenuComponent},
+  { path: 'report', component: ReportComponent},
   { path: 'signUp', component: SignUpComponent},
   { path: 'test', component: MyTestComponent},
   { path: '', pathMatch: 'full', redirectTo: '/menu'},

@@ -5,6 +5,7 @@ import { map, shareReplay } from 'rxjs/operators';
 import { Globals } from '../globals';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/_shared/user.service';
+import { ShopifyService } from '../_shared/shopify.service';
 
 @Component({
   selector: 'app-main-nav',
@@ -18,11 +19,14 @@ export class MainNavComponent implements OnInit {
       shareReplay()
     );
     private UserService: UserService;
+    private service: ShopifyService;
+    count: any;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
     public globals: Globals,
     private router: Router,
+    service: ShopifyService,
     private userService: UserService
     ) {
       this.UserService = userService;
@@ -57,6 +61,11 @@ export class MainNavComponent implements OnInit {
       this.globals.FirstName = '';
       this.globals.loginUser = false;
       this.router.navigateByUrl('/menu');
+    }
+
+    refresh() {
+
+
     }
 }
 

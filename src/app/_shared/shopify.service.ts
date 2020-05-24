@@ -44,7 +44,6 @@ export class ShopifyService {
   }
 
   CTGetMultiOrders(OrderNo: string): Observable<any> {
-    console.log('Get Multi Orders', OrderNo);
     return this.http.get<any>(this.rootURL + '/MultiStore/' + OrderNo);
   }
 
@@ -53,18 +52,20 @@ export class ShopifyService {
   }
 
   CTGetVendID(OrderNo: string): Observable<string> {
-    console.log('Get VendId', OrderNo);
     return this.http.get<string>(this.rootURL + '/OpenVend/' + OrderNo);
   }
 
   CTGetVendOrder(OrderID: string): Observable<string> {
-    console.log('Get VendId', OrderID);
     return this.http.get<string>(this.rootURL + '/GetVendOrder/' + OrderID);
   }
 
   CTUpdateVendOrder(orderNo: string, splitTotal: any) {
-    console.log('update Vend', splitTotal);
     return this.http.put(this.rootURL + '/VendUpdates/' + orderNo, splitTotal);
+  }
+
+
+  CTVendTest(orderNO: string, splitTotal: any) {
+    return this.http.put(this.rootURL + '/VendTest/' + orderNO,   splitTotal);
   }
 
   putxxx(formRole: any) {

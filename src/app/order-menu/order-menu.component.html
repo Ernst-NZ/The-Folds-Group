@@ -1,7 +1,9 @@
 <div class='container-fluid' *ngIf="this.filteredText">
   <div class='row' style='text-align: center; margin: auto;'>
     <div class='col-12' style='text-align: center;'>
-      <h2><u>The Fold Group Orders</u></h2>
+      <h2><u>The Fold Group Orders</u><button class="btn fontWhite" style="top: 0px; position: absolute;"
+        (click)="refresh()" mat-icon-update><mat-icon>update</mat-icon></button></h2>
+
     </div>
   </div>
 
@@ -39,7 +41,7 @@
     </div>
     <div class='col-sm-3 center'>
       <label class='bu' style='margin-bottom: 0px;'>
-        Un-fulfilled Only:
+        Un-Allocated Only:
       </label>
       <div class="custom-control form-control-lg custom-checkbox" style="padding-top: 0em;">
         <input type="checkbox" class="custom-control-input" id="Status" name="Status" #Status="ngModel"
@@ -53,11 +55,11 @@
       *ngIf='filteredText'>
       <thead class="table-primary">
         <tr>
-          <th (click)="sort('OrderNumber')">Order ({{filteredText.length}})</th>
+          <th (click)="sort('OrderNumber')">Order ({{filteredText.length}})<br>(Open Shopify)</th>
           <th (click)="sort('OrderDate')">Date</th>
           <th (click)="sort('OrderCustomer')">Customer</th>
           <!-- <th (click)="sort('OrderPayment')" *ngIf="!(isHandset$ | async)">Payment</th> -->
-          <th (click)="sort('FoldStore')">Store</th>
+          <th (click)="sort('FoldStore')">Store<br>(Details)</th>
           <th (click)="sort('FoldStatus')" *ngIf="!(isHandset$ | async)">Status</th>
           <th (click)="sort('OrderItemTotal')">Item Total</th>
           <th (click)="sort('OrderTotal')" *ngIf="!(isHandset$ | async)">Total</th>
@@ -137,7 +139,7 @@
       (click)="openVend()" style='text-align: center; max-width: 250px; margin: auto; '>Open Vend Order</button>
     </div>
 
-    <div *ngIf='MultiOrders' style="text-align: center;"><button class="btn btn-warning btn-small btn-block center"
+    <div *ngIf='!this.Allocated' style="text-align: center;"><button class="btn btn-warning btn-small btn-block center"
       (click)="getCurrent()" style='text-align: center; max-width: 250px; margin: auto; font-weight: bold; text-decoration: underline;'>Get Current Stock Levels<br>(This will take some time!)</button></div>
     <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 1em; width: 100%; font-weight: bold;'
     *ngIf='MultiOrders'>
@@ -153,27 +155,27 @@
       <tr [ngClass]="(pak.ItemId)?'fontBlack':'fontRed'" *ngFor="let pak of this.MultiOrders; let i = index" [attr.data-index]="i">
         <td>
           <span *ngIf='pak.ItemSKU != "Total"'>{{ pak.ItemId }}</span>
-          <span *ngIf='pak.ItemSKU === "Total"'>{{ OrderItemTotal}}</span>
+          <!-- <span *ngIf='pak.ItemSKU === "Total"'>{{ OrderItemTotal}}</span> -->
         </td>
         <td>
           <span *ngIf='pak.ItemSKU != "Total"'>{{ pak.ItemSKU}}</span>
         </td>
         <td>
           <select *ngIf='pak.ItemSKU != "Total"' class="custom-select" style="width: 100%" name="Id" (change)='onProdSelect($event)' >
-            <option [value]="0">-Select Store-</option>
+            <option *ngIf='!this.Allocated' [value]="0">-Select Store-</option>
             <option *ngFor="let s of pak.Store" [value]="s.SKU">{{ s.Stock }} - {{ s.Store}}</option>
           </select>
-          <label  *ngIf='pak.ItemSKU === "Total"' >{{ this.tempSplit.length }}</label>
+          <!-- <label  *ngIf='pak.ItemSKU === "Total"' >{{ this.tempSplit.length }}</label> -->
         </td>
         <td>
           {{ pak.LastSale }}
 
         </td>
       </tr>
-      <tr>
-        <td colspan="3" style="text-align: center;">
+      <tr *ngIf='!this.Allocated'>
+        <td colspan="4" style="text-align: center;">
           <button *ngIf='this.tempSplit.length === OrderItemTotal && ReadyForPost' class="btn btn-success btn-small"
-              (click)="splitOrders()" style='text-align: center;'>Process Orders</button>
+              (click)="splitOrders(); modal.dismiss()" style='text-align: center;'>Process Orders</button>
         </td>
       </tr>
       <tr *ngIf="MultiOrders.length === 0">
@@ -189,8 +191,8 @@
     <tr>
       <th (click)="sort('Store')">Store</th>
       <th (click)="sort('Items')">Items</th>
-      <th (click)="sort('Items')">SKU Numbers</th>
-      <th (click)="sort('Items')">Process Order</th>
+      <th (click)="sort('SKUList')">SKU Numbers</th>
+      <th (click)="sort('Processed')">Process Order</th>
     </tr>
   </thead>
   <tbody>
@@ -202,7 +204,7 @@
         <span>{{ pak.Items}}</span>
       </td>
       <td>
-        <span>{{ pak.SKU}}</span>
+        <span>{{ pak.SKUList}}</span>
       </td>
       <td>
         <button *ngIf='this.tempSplit.length === OrderItemTotal && !pak.Processed' class="btn btn-info btn-small"

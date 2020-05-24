@@ -38,7 +38,6 @@ export class MenuAuthComponent implements OnInit {
         .subscribe((cat: any[]) => {
           this.count = cat;
           console.log(this.count);
-          if (this.count['count']) { }
           this.totalOrders = this.count['count'] ;
           if (this.totalOrders > 0) {
             this.service.getorders()
@@ -89,6 +88,10 @@ export class MenuAuthComponent implements OnInit {
 
   SPGetOrders() {
     this.router.navigate(['/orderMenu/']);
+  }
+
+  getReport() {
+      this.router.navigate(['/report/']);
   }
 
 
