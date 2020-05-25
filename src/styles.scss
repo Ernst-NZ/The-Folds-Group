@@ -269,7 +269,10 @@ div.validation-error {
   border-top: black solid 2px;
 }
 
-// #pageSpinner {
-//   z-index: -1;
-//     position:relative;
-// }
+div.card {
+  box-shadow: 10px 4px 8px 0 rgba(0, 0, 0, 0.3), 0 6px 20px 12px rgba(0, 0, 0, 0.2);
+  padding-bottom: 2vw;
+  min-height: 25vw;
+  border-radius: 10px;
+  width: 100%;
+}

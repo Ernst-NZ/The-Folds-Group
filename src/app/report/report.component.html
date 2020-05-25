@@ -1,35 +1,155 @@
-<table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 1em; width: 100%; font-weight: bold;'> 0'>
-  <thead class="table-primary">
-    <tr>
-      <th (click)="('Store')">Vend Total</th>
-      <th (click)="('Items')">Shopify Fees</th>
-      <th (click)="('SKUList')">Paypal Fees</th>
-      <th (click)="('Processed')">Shipping Fees</th>
-      <th (click)="('Processed')">Total Due</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let i = index" [attr.data-index]="i">
-      <td>
-        <span></span>
-      </td>
-      <td>
-        <span></span>
-      </td>
-      <td>
-        <span></span>
-      </td>
-      <td>
+<div class="container card" >
+  <div class='row fontBlack' style='padding-top: 5px; text-align: center;'>
+    <div class='col-sm-4'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        Hide Details:
+      </label>
+      <div class="custom-control form-control-lg custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="Status" name="Status" #Status="ngModel"
+          [(ngModel)]="hideDetails" (change)='preFilter()'>
+        <label class="custom-control-label" for="Status"></label>
+      </div>
+    </div>
+    <div class='col-sm-2'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        Brooklyn:
+      </label>
+      <div class="custom-control form-control-lg custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="Brooklyn" name="Brooklyn" #Brooklyn="ngModel"
+          [(ngModel)]="showBrooklyn" (change)='setBrooklyn()'>
+        <label class="custom-control-label" for="Brooklyn"></label>
+      </div>
+    </div>
+    <div class='col-sm-2'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        Howard:
+      </label>
+      <div class="custom-control form-control-lg custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="Howard" name="Howard" #Howard="ngModel"
+          [(ngModel)]="showHoward" (change)='this.setHoward()'>
+        <label class="custom-control-label" for="Howard"></label>
+      </div>
+    </div>
+    <div class='col-sm-2'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        GoodLad:
+      </label>
+      <div class="custom-control form-control-lg custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="GoodLad" name="GoodLad" #GoodLad="ngModel"
+          [(ngModel)]="showGoodLad" (change)='setGoodLad()'>
+        <label class="custom-control-label" for="GoodLad"></label>
+      </div>
+    </div>
+    <div class='col-sm-2'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        West:
+      </label>
+      <div class="custom-control form-control-lg custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="West" name="West" #West="ngModel"
+          [(ngModel)]="showWest" (change)='setWest()'>
+        <label class="custom-control-label" for="West"></label>
+      </div>
+    </div>
+  </div>
+  <div class='row fontBlack' style='padding-top: 5px; text-align: center;'>
+    <div class='col-sm-1 center'></div>
+    <div class='col-sm-3'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        From Date:
+      </label>
+      <div class="input-group">
+        <input class="form-control" placeholder="dd-mm-yyyy" name="dpFrom" [(ngModel)]="dateFrom" ngbDatepicker
+          #dpFrom="ngbDatepicker" (closed)="preFilter()">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" (click)="dpFrom.toggle(); preDate()" type="button">📅</button>
+        </div>
+      </div>
+    </div>
+    <div class='col-sm-3'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        To Date:
+      </label>
+      <div class="input-group">
+        <input class="form-control" placeholder="dd-mm-yyyy" name="dpTo" [(ngModel)]="dateTo" ngbDatepicker
+          #dpTo="ngbDatepicker" (closed)="preFilter()">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" (click)="dpTo.toggle(); preDate()" type="button">📅</button>
+        </div>
+      </div>
+    </div>
 
-      </td>
-      <td>
 
+    <div class='col-sm-3'><label class='bu' style='margin-bottom: 0px;'>
+      Clear Filters:
+    </label><br>
+    <button type="button" class="btn btn-sm btn-info" (click)="resetFilters()">Clear All Filters</button>
+  </div>
+  </div>
+
+
+  <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped black" style='font-size: 1em; width: 100%; background-color: lightgray; margin: auto;'>
+    <thead class="table-primary">
+      <tr>
+        <th (click)="('OrderDate')">Date</th>
+        <th (click)="('FoldStore')">Register</th>
+        <th (click)="('OrderId')">Order No</th>
+        <th (click)="('VendCost')">Vend Total</th>
+        <th (click)="('Shopify29')">Shopify Fees</th>
+        <th (click)="('Paypal')">Paypal Fees</th>
+        <th (click)="('ShippingCost')">Shipping Fees</th>
+        <th (click)="('TotalDue')">Total Due</th>
+        <th [colSpan]=2></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pak of this.filteredText; let i = index" [attr.data-index]="i" [attr.data-id]="pak.FoldId" [ngClass]="(pak.OrderDate ==='Total')?'bold':'fontBlack'">
+        <td>
+            <span *ngIf='pak.FoldStore !=="xTotal"' style="text-align: left;">{{ pak.OrderDate }}</span>
+            <span *ngIf='pak.FoldStore ==="xTotal"'style="text-align: left;">GROUP TOTAL</span>
+        </td>
+        <td>
+          <span *ngIf='pak.FoldStore !=="xTotal"' style="text-align: left;">{{ pak.FoldStore }}</span>
       </td>
-    </tr>
-    <tr>
-      <td colspan='6'>
-        <span>No Information Available</span>
-      </td>
-    </tr>
-  </tbody>
-</table>
+        <td>
+          <span *ngIf='pak.OrderDate !== "Total"'>#{{ pak.OrderId }}</span>
+          <span *ngIf='pak.OrderDate === "Total"' style="font-weight: bold;">Total:</span>
+        </td>
+        <td>
+          <span>${{ pak.VendCost }}</span>
+        </td>
+        <td>
+          <span>${{ pak.Shopify29 | number:'0.0-2' }}</span>
+        </td>
+        <td>
+          <input type="text" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldPaypal"
+              class="form-control" style="margin-bottom: 0px; border-radius: 5px; max-width: 100px; " />
+            <span *ngIf="!pak.editing">${{ pak.Paypal }}</span>
+        </td>
+        <td>
+          <input type="text" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldShippingCost"
+              class="form-control" style="margin-bottom: 0px; border-radius: 5px; max-width: 100px; " />
+            <span *ngIf="!pak.editing">${{ pak.ShippingCost }}</span>
+        </td>
+        <td>
+          <span>${{ pak.TotalDue }}</span>
+        </td>
+        <td>
+          <div *ngIf='pak.OrderDate !== "Total"' class="btn-group btn-group-sm" role="group" style="width: 100%">
+            <button class="btn btn-success btn-sm" *ngIf="pak.editing"
+            (click)="updateFold();pak.editing=false">Update</button>
+          <button class="btn btn-info btn-sm" *ngIf="!pak.editing"
+            (click)="pak.editing=true; getFold(pak.FoldId);">Edit</button>
+            <button class="btn btn-secondary btn-sm" *ngIf="pak.editing"
+            (click)="pak.editing=false">Cancel</button>
+        </div>
+        </td>
+      </tr>
+      <tr *ngIf='!filteredText'>
+        <td colspan='10'>
+          <span>No Information Available</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

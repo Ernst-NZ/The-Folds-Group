@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Globals } from '../globals';
 import { Observable } from 'rxjs';
+import { ICostReport } from './interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -63,9 +64,22 @@ export class ShopifyService {
     return this.http.put(this.rootURL + '/VendUpdates/' + orderNo, splitTotal);
   }
 
-
   CTVendTest(orderNO: string, splitTotal: any) {
     return this.http.put(this.rootURL + '/VendTest/' + orderNO,   splitTotal);
+  }
+
+  SPGetCostReport() {
+    return this.http.get(this.rootURL + '/CostReport/');
+  }
+
+  getFolds(FoldId: number) {
+    return this.http.get(this.rootURL + '/Folds/' + FoldId);
+  }
+
+   // Edit one
+   putFolds(editFold: any) {
+    console.log(editFold);
+    return this.http.put(this.rootURL + '/Folds/' + editFold.FoldId, editFold );
   }
 
   putxxx(formRole: any) {
