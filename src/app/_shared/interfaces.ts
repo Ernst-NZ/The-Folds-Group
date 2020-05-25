@@ -55,3 +55,29 @@ export class ShopOrders implements IShopOrders {
   FoldShipDate: string;
   FoldComments: string;
 }
+
+export interface ICostReport {
+  OrderDate: string;
+  FoldStore: string;
+  OrderId: string;
+  VendCost: number;
+  Shopify30: number;
+  Shopify29: number;
+  Paypal: number;
+  ShippingCost: number;
+  TotalDue: number;
+  editing: boolean;
+}
+
+export class CostReport implements ICostReport {
+  OrderDate: string;
+  FoldStore: string;
+  OrderId: string;
+  VendCost: number;
+  Shopify30: number;
+  Shopify29: number;
+  Paypal: number;
+  ShippingCost: number;
+  TotalDue: number;
+  editing: boolean;
+}

@@ -26,7 +26,7 @@ export class FooterComponent implements OnInit {
   }
 
   showVersion() {
-    alert('Fold Version Test 22/5/Beta');
+    alert('Fold Version Test 26/5/Beta');
   }
 
 }

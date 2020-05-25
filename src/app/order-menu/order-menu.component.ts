@@ -175,7 +175,7 @@ export class OrderMenuComponent implements OnInit {
     if (
       this.outstanding ||
       this.selectedToDate ||
-      this.selectedToDate
+      this.selectedFromDate
     ) {
       this.filterPromise();
     } else {
