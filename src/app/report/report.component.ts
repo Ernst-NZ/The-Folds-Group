@@ -6,6 +6,7 @@ import {
   NgbDateStruct, NgbCalendar, NgbDateParserFormatter, NgbModal, ModalDismissReasons
 } from '@ng-bootstrap/ng-bootstrap';
 import { ICostReport, CostReport } from '../_shared/interfaces';
+import { SorterService } from '../_shared/sorter.service';
 
 @Component({
   selector: 'app-report',
@@ -41,6 +42,7 @@ export class ReportComponent implements OnInit {
     service: ShopifyService,
     private spinner: NgxSpinnerService,
     private calendar: NgbCalendar,
+    private sorterService: SorterService,
   ) {
     this.service = service;
    }
@@ -50,6 +52,7 @@ export class ReportComponent implements OnInit {
     this.service.SPGetCostReport()
       .subscribe((cat: ICostReport[]) => {
         (this.report = cat);
+        console.log(this.report);
         for (const order of this.report) {
           let endInt = 0;
           if (order.OrderDate !== 'Total' ) {
@@ -58,7 +61,7 @@ export class ReportComponent implements OnInit {
           }
         }
         this.filteredText = this.report;
-     //   console.log(this.report);
+        console.log(this.report);
         this.spinner.hide();
       },
         (err) => {
@@ -73,6 +76,11 @@ export class ReportComponent implements OnInit {
     this.dateTo = this.calendar.getToday();
   }
 
+
+  sort(prop: string) {
+    // A sorter service will handle the sorting
+    this.sorterService.sort(this.filteredText, prop);
+  }
 
   refreshData() {
     this.spinner.show();

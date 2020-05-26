@@ -8,12 +8,12 @@
   </div>
 
   <div class='row' style='padding-top: 5px; background-color: darkgrey; margin-left: 10px; margin-right: 10px;'>
-    <div class='col-sm-3'>
+    <div class='col-sm-2'>
       <label class='bu' style='margin-bottom: 0px;'>
         Search:
       </label><br>
       <input placeholder="Search ..." [value]="searchText" (keyup)="filter($event.target.value)"
-        style="height: 2.5em; width: 100%; border-radius: 5px; vertical-align: middle; padding-left: 5px;">
+        style="height: 2.5em; width: 100%; border-radius: 5px; vertical-align: middle; padding-left: 5px;" [(ngModel)] ='searchText'>
     </div>
     <div class='col-sm-3'>
       <label class='bu' style='margin-bottom: 0px;'>
@@ -39,7 +39,7 @@
         </div>
       </div>
     </div>
-    <div class='col-sm-3 center'>
+    <div class='col-sm-2 center'>
       <label class='bu' style='margin-bottom: 0px;'>
         Un-Allocated Only:
       </label>
@@ -47,6 +47,16 @@
         <input type="checkbox" class="custom-control-input" id="Status" name="Status" #Status="ngModel"
           [(ngModel)]="outstanding" (change)='preFilter()'>
         <label class="custom-control-label" for="Status"></label>
+      </div>
+    </div>
+    <div class='col-sm-2 center'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        Not Shipped:
+      </label>
+      <div class="custom-control form-control-lg custom-checkbox" style="padding-top: 0em;">
+        <input type="checkbox" class="custom-control-input" id="Shipped" name="shipped" #Shipped="ngModel"
+          [(ngModel)]="shipped" (change)='preFilter()'>
+        <label class="custom-control-label" for="Shipped"></label>
       </div>
     </div>
   </div>
@@ -63,11 +73,14 @@
           <th (click)="sort('FoldStatus')" *ngIf="!(isHandset$ | async)">Status</th>
           <th (click)="sort('OrderItemTotal')">Item Total</th>
           <th (click)="sort('OrderTotal')" *ngIf="!(isHandset$ | async)">Total</th>
+          <th (click)="sort('FoldPaypal')">Paypal Fees</th>
+          <th (click)="sort('FoldShippingCost')">Shipping Fees</th>
           <th (click)="sort('FoldComments')" *ngIf="!(isHandset$ | async)">Comments</th>
+          <th [colSpan]=2></th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let pak of this.filteredText; let i = index" [attr.data-index]="i"
+        <tr *ngFor="let pak of this.filteredText; let i = index" [attr.data-index]="i" [attr.data-id]="pak.FoldId"
           [ngClass]="(pak.FoldStatus)?'fontBlack':'fontRed'">
           <td>
             <button *ngIf='!pak.FoldStatus && (pak.FoldStore !== "NO SKU" && pak.FoldStore !== "Multiple Stores" )'
@@ -89,13 +102,13 @@
             {{ pak.OrderPayment}}
           </td> -->
           <td>
-            <button *ngIf='!pak.FoldStatus && (pak.FoldStore !== "NO SKU" && pak.FoldStore !== "Multiple Stores" )'
+            <button *ngIf='!pak.FoldShippingCost && (pak.FoldStore !== "NO SKU" && pak.FoldStore !== "Multiple Stores" ) && pak.FoldShippingCost != 0'
               class="btn btn-warning btn-small btn-block" (click)="openComments(comments, pak)"
               style='text-align: left;'>{{ pak.FoldStore }}</button>
             <button *ngIf='(pak.FoldStore === "NO SKU" || pak.FoldStore === "Multiple Stores" )'
               class="btn btn-danger btn-small btn-block" (click)="openComments(comments, pak)"
               style='text-align: left;'>{{ pak.FoldStore }}</button>
-            <button *ngIf='(pak.FoldStatus === "VOIDED" || pak.FoldStatus === "CLOSED") && pak.FoldStore !== "Multiple Stores"' class="btn btn-success btn-small btn-block"
+            <button *ngIf='(pak.FoldShippingCost || pak.FoldShippingCost === 0) && pak.FoldStore !== "Multiple Stores"' class="btn btn-success btn-small btn-block"
               (click)="openComments(comments, pak)" style='text-align: left;'>{{ pak.FoldStore }}</button>
           </td>
           <td *ngIf="!(isHandset$ | async)">
@@ -107,12 +120,32 @@
           <td *ngIf="!(isHandset$ | async)">
             ${{ pak.OrderTotal}}
           </td>
+          <td>
+            <input type="text" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldPaypal"
+                class="form-control" style="margin-bottom: 0px; border-radius: 5px; max-width: 100px; " />
+              <span *ngIf="!pak.editing">${{ pak.FoldPaypal }}</span>
+          </td>
+          <td>
+            <input type="text" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldShippingCost"
+                class="form-control" style="margin-bottom: 0px; border-radius: 5px; max-width: 100px; " />
+              <span *ngIf="!pak.editing">${{ pak.FoldShippingCost }}</span>
+          </td>
           <td *ngIf="!(isHandset$ | async)">
             <span [innerHTML]="pak.FoldComments" style="width:95%; opacity: 0.8; font-size: 1em"></span>
           </td>
+          <td>
+            <div *ngIf='pak.OrderDate !== "Total"' class="btn-group btn-group-sm" role="group" style="width: 100%">
+              <button class="btn btn-success btn-sm" *ngIf="pak.editing"
+              (click)="updateFold();pak.editing=false">Update</button>
+            <button class="btn btn-info btn-sm" *ngIf="!pak.editing"
+              (click)="pak.editing=true; getFold(pak.FoldId);">Edit</button>
+              <button class="btn btn-secondary btn-sm" *ngIf="pak.editing"
+              (click)="pak.editing=false">Cancel</button>
+          </div>
+          </td>
         </tr>
         <tr *ngIf="filteredText.length === 0">
-          <td colspan='6'>
+          <td colspan='12'>
             <span>No Information Available</span>
           </td>
         </tr>
@@ -131,16 +164,17 @@
     </button>
   </div>
   <div class="modal-body appBackGround">
-    <div *ngIf='this.Allocated === true'>
-      <!-- <h3> - To Do - <br>Order has been allocated but not dispatched</h3> -->
-    </div>
     <div>
       <button class="btn btn-info btn-small btn-block center"
       (click)="openVend()" style='text-align: center; max-width: 250px; margin: auto; '>Open Vend Order</button>
     </div>
-
-    <div *ngIf='!this.Allocated' style="text-align: center;"><button class="btn btn-warning btn-small btn-block center"
-      (click)="getCurrent()" style='text-align: center; max-width: 250px; margin: auto; font-weight: bold; text-decoration: underline;'>Get Current Stock Levels<br>(This will take some time!)</button></div>
+    <div *ngIf='this.Allocated === true' style="text-align: center; color: black; font-size: 1em; font-weight: bold; text-decoration: underline;">
+      <span>This Order has been allocated to: {{this.allocatedStore}}</span>
+    </div>
+    <div *ngIf='!this.Allocated' style="text-align: center;">
+      <button class="btn btn-warning btn-small btn-block center"
+      (click)="getCurrent()" style='text-align: center; max-width: 250px; margin: auto; font-weight: bold; text-decoration: underline;'>Get Current Stock Levels<br>(This will take some time!)</button>
+    </div>
     <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped" style='font-size: 1em; width: 100%; font-weight: bold;'
     *ngIf='MultiOrders'>
     <thead class="table-primary">
@@ -169,8 +203,12 @@
         </td>
         <td>
           {{ pak.LastSale }}
-
         </td>
+      </tr>
+      <tr *ngIf='this.Allocated'>
+        <td colspan="4" style="text-align: center;">
+        <span style="text-align: center;" [innerHTML]="FoldComments"></span>
+      </td>
       </tr>
       <tr *ngIf='!this.Allocated'>
         <td colspan="4" style="text-align: center;">
@@ -207,7 +245,9 @@
         <span>{{ pak.SKUList}}</span>
       </td>
       <td>
-        <button *ngIf='this.tempSplit.length === OrderItemTotal && !pak.Processed' class="btn btn-info btn-small"
+        <button *ngIf='this.tempSplit.length === OrderItemTotal && !pak.Processed && pak.Store !="REFUND"' class="btn btn-info btn-small"
+              (click)="testSingle(pak.Store)" style='text-align: left;'>Confirm Order</button>
+              <button *ngIf='this.tempSplit.length === OrderItemTotal && !pak.Processed  && pak.Store ==="REFUND"' class="btn btn-danger btn-small"
               (click)="testSingle(pak.Store)" style='text-align: left;'>Confirm Order</button>
         <span *ngIf='pak.Processed'>{{ pak.Processed }}</span>
       </td>

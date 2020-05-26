@@ -8,6 +8,7 @@ import { SignUpComponent } from './sign-up/sign-up.component';
 import { OrderMenuComponent } from './order-menu/order-menu.component';
 import { MyTestComponent } from './my-test/my-test.component';
 import { ReportComponent } from './report/report.component';
+import { PlayComponent } from './play/play.component';
 
 const routes: Routes = [
   { path: 'auth', component: AuthComponent},
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'login', component: SignInComponent},
   { path: 'menu', component: MenuComponent},
   { path: 'orderMenu', component: OrderMenuComponent},
+  { path: 'play', component: PlayComponent},
   { path: 'report', component: ReportComponent},
   { path: 'signUp', component: SignUpComponent},
   { path: 'test', component: MyTestComponent},

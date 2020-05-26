@@ -41,6 +41,7 @@ import { MenuAuthComponent } from './menu/menu-auth/menu-auth.component';
 import { OrderMenuComponent } from './order-menu/order-menu.component';
 import { MyTestComponent } from './my-test/my-test.component';
 import { ReportComponent } from './report/report.component';
+import { PlayComponent } from './play/play.component';
 
 
 @NgModule({
@@ -57,7 +58,8 @@ import { ReportComponent } from './report/report.component';
     MenuAuthComponent,
     OrderMenuComponent,
     MyTestComponent,
-    ReportComponent
+    ReportComponent,
+    PlayComponent
   ],
   imports: [
     BrowserModule,

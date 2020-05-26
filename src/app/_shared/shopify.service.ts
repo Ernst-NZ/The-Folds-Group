@@ -65,6 +65,7 @@ export class ShopifyService {
   }
 
   CTVendTest(orderNO: string, splitTotal: any) {
+    console.log('#####################################')
     return this.http.put(this.rootURL + '/VendTest/' + orderNO,   splitTotal);
   }
 
@@ -76,6 +77,10 @@ export class ShopifyService {
     return this.http.get(this.rootURL + '/Folds/' + FoldId);
   }
 
+  updateCost(orderNo: string,  editFold: any) {
+    return this.http.put(this.rootURL + '/UpdateCost/' + orderNo,   editFold);
+  }
+
    // Edit one
    putFolds(editFold: any) {
     console.log(editFold);
@@ -84,5 +89,9 @@ export class ShopifyService {
 
   putxxx(formRole: any) {
     return this.http.post(this.rootURL + '/roles/' + formRole.Id, formRole);
+  }
+
+  testPut(orderNo: string,  editFold: any) {
+    return this.http.put(this.rootURL + '/UpdateCost/' + orderNo,   editFold);
   }
 }

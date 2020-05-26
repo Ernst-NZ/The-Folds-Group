@@ -52,7 +52,7 @@
     </div>
   </div>
   <div class='row fontBlack' style='padding-top: 5px; text-align: center;'>
-    <div class='col-sm-1 center'></div>
+    <div class='col-sm-2 center'></div>
     <div class='col-sm-3'>
       <label class='bu' style='margin-bottom: 0px;'>
         From Date:
@@ -79,7 +79,7 @@
     </div>
 
 
-    <div class='col-sm-3'><label class='bu' style='margin-bottom: 0px;'>
+    <div class='col-sm-2'><label class='bu' style='margin-bottom: 0px;'>
       Clear Filters:
     </label><br>
     <button type="button" class="btn btn-sm btn-info" (click)="resetFilters()">Clear All Filters</button>
@@ -90,15 +90,15 @@
   <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped black" style='font-size: 1em; width: 100%; background-color: lightgray; margin: auto;'>
     <thead class="table-primary">
       <tr>
-        <th (click)="('OrderDate')">Date</th>
-        <th (click)="('FoldStore')">Register</th>
-        <th (click)="('OrderId')">Order No</th>
-        <th (click)="('VendCost')">Vend Total</th>
-        <th (click)="('Shopify29')">Shopify Fees</th>
-        <th (click)="('Paypal')">Paypal Fees</th>
-        <th (click)="('ShippingCost')">Shipping Fees</th>
-        <th (click)="('TotalDue')">Total Due</th>
-        <th [colSpan]=2></th>
+        <th (click)="sort('OrderDate')">Date</th>
+        <th (click)="sort('FoldStore')">Register</th>
+        <th (click)="sort('OrderId')">Order No</th>
+        <th (click)="sort('VendCost')">Vend Total</th>
+        <th (click)="sort('Shopify30')">Shopify Fees</th>
+        <th (click)="sort('Paypal')">Paypal Fees</th>
+        <th (click)="sort('ShippingCost')">Shipping Fees</th>
+        <th (click)="sort('TotalDue')">Total Due</th>
+        <!-- <th [colSpan]=2></th> -->
       </tr>
     </thead>
     <tbody>
@@ -118,7 +118,7 @@
           <span>${{ pak.VendCost }}</span>
         </td>
         <td>
-          <span>${{ pak.Shopify29 | number:'0.0-2' }}</span>
+          <span>${{ pak.Shopify30 | number:'0.0-2' }}</span>
         </td>
         <td>
           <input type="text" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldPaypal"
@@ -133,7 +133,7 @@
         <td>
           <span>${{ pak.TotalDue }}</span>
         </td>
-        <td>
+        <!-- <td>
           <div *ngIf='pak.OrderDate !== "Total"' class="btn-group btn-group-sm" role="group" style="width: 100%">
             <button class="btn btn-success btn-sm" *ngIf="pak.editing"
             (click)="updateFold();pak.editing=false">Update</button>
@@ -142,7 +142,7 @@
             <button class="btn btn-secondary btn-sm" *ngIf="pak.editing"
             (click)="pak.editing=false">Cancel</button>
         </div>
-        </td>
+        </td> -->
       </tr>
       <tr *ngIf='!filteredText'>
         <td colspan='10'>
@@ -152,4 +152,7 @@
     </tbody>
   </table>
 </div>
+<ngx-spinner id="pageSpinner" #pageSpinner bdOpacity=0.9 bdColor="" size="medium" color="#f30808" type="ball-running-dots" fullScreen="false">
+  <h1 style="color: white; background-color: darkgray;"> Loading... </h1>
+</ngx-spinner>
 
