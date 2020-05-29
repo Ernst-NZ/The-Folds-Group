@@ -26,7 +26,7 @@ export class ReportComponent implements OnInit {
   oldReport: any;
   filteredText: any;
   errors: any;
-  hideDetails: boolean;
+  hideDetails = true;
   selectedFromDate: any;
   lastMonth: any;
   selectedToDate: any;
@@ -37,6 +37,9 @@ export class ReportComponent implements OnInit {
   showGoodLad = false;
   showWest = false;
   showHoward = false;
+  showRefund = false;
+  dateDD: any[] = [];
+  filterDate: any[] = [];
 
   constructor(
     service: ShopifyService,
@@ -45,88 +48,80 @@ export class ReportComponent implements OnInit {
     private sorterService: SorterService,
   ) {
     this.service = service;
-   }
+  }
 
   ngOnInit(): void {
     this.spinner.show();
-    this.service.SPGetCostReport()
-      .subscribe((cat: ICostReport[]) => {
-        (this.report = cat);
-        console.log(this.report);
-        for (const order of this.report) {
-          let endInt = 0;
-          if (order.OrderDate !== 'Total' ) {
-            endInt = order.OrderDate.indexOf(' ');
-            order.OrderDate = order.OrderDate.substring(0, endInt);
-          }
-        }
-        this.filteredText = this.report;
-        console.log(this.report);
-        this.spinner.hide();
-      },
-        (err) => {
-          console.log(err);
-          this.spinner.hide();
-        });
-    const tempYear = new Date().getFullYear();
-    const tempMonth = new Date().getMonth();
-    const tempDay = new Date().getDate();
-    this.lastMonth = { year: +tempYear, month: +tempMonth, day: +tempDay };
-    this.dateFrom = this.lastMonth;
-    this.dateTo = this.calendar.getToday();
+    this.dateFrom = this.calendar.getToday();
+    const lastDay = function(y , m) {
+      return  new Date(y, m + 1, 0).getDate();
+      };
+    let endOfMonth = 1;
+    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month + 1);
+    this.dateTo = { year: +this.dateFrom.year, month: +this.dateFrom.month , day: +endOfMonth };
+    this.dateFrom.day = 1;
+    this.getDateData();
+    this.buildDropDown();
   }
 
+  delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
+
+  async getDateData() {
+    console.log('pre data', this.dateFrom, this.dateTo);
+    this.spinner.show();
+    await this.delay(1000);
+    this.filterDate = [];
+    console.log('pre data', this.dateFrom, this.dateTo);
+    let tempFrom = this.dateFrom.month.toString();
+    tempFrom = tempFrom.concat('/', this.dateFrom.day.toString(), '/', this.dateFrom.year.toString());
+    let tempTo = this.dateTo.month.toString();
+    tempTo = tempTo.concat('/', this.dateTo.day.toString(), '/', this.dateTo.year.toString());
+    this.filterDate.push({
+      fromDate: tempFrom,
+      toDate: tempTo,
+    });
+    this.service.SPGetCostReport(this.filterDate)
+    .subscribe((cat: ICostReport[]) => {
+      (this.report = cat);
+      for (const order of this.report) {
+        let endInt = 0;
+        if (order.OrderDate !== 'Total') {
+          endInt = order.OrderDate.indexOf(' ');
+          order.OrderDate = order.OrderDate.substring(0, endInt);
+        }
+      }
+      this.filteredText = this.report;
+      this.preFilter();
+      this.spinner.hide();
+    },
+      (err) => {
+        console.log(err);
+        this.spinner.hide();
+      });
+
+  }
+
+  onMonthSelect(args) {
+    this.spinner.show();
+    this.filterDate = [];
+    const lastDay = function(y , m) {
+      return  new Date(y, m + 1, 0).getDate();
+      };
+    let i = null;
+    i = args.target.value;
+    let endOfMonth = 1;
+    this.dateFrom = this.dateDD[i]['value'];
+    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month + 1);
+    this.dateTo = { year: +this.dateFrom.year, month: +this.dateFrom.month , day: +endOfMonth };
+    this.getDateData();
+  }
 
   sort(prop: string) {
     // A sorter service will handle the sorting
     this.sorterService.sort(this.filteredText, prop);
-  }
-
-  refreshData() {
-    this.spinner.show();
-    this.service.SPGetCostReport()
-      .subscribe((cat: ICostReport[]) => {
-        (this.report = cat);
-        this.filteredText = this.report;
-        this.spinner.hide();
-      },
-        (err) => {
-          console.log(err);
-          this.spinner.hide();
-        });
-  }
-
-  getFold(CheckId) {
-    this.spinner.show();
-    this.service.getFolds(CheckId).subscribe(
-      (check: any[]) => {
-        if (check) {
-          this.oldReport = check;
-          this.spinner.hide();
-        }
-      },
-      error => {
-        this.errors = error;
-        console.log(this.errors);
-      }
-    );
-  }
-
-  clearOldReport() {
-    this.oldReport = new CostReport();
-  }
-
-  updateFold() {
-    this.spinner.show();
-    this.service.putFolds(this.oldReport).subscribe(
-      () => {
-        this.refreshData();
-      },
-      error => {
-        this.errors = error;
-        alert(this.errors);
-      }
-    );
   }
 
   setBrooklyn() {
@@ -154,21 +149,38 @@ export class ReportComponent implements OnInit {
     this.showBrooklyn = false;
     this.preFilter();
   }
-
-
-
-  // onDetailClick() {
-
-  //   this.preFilter();
-  // }
-
-  preDate() {
-    this.oldFrom = this.dateFrom;
-    this.oldTo = this.dateTo;
-    this.pendingDate = true;
+  setRefund() {
+    this.preFilter();
   }
 
+  formatDates(date: Date, index: number) {
+    const tempYear = new Date(date).getFullYear().toString();
+    const tempMonth = new Date(date).getMonth().toString();
+    const tempDay = new Date(date).getDate().toString();
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                     'July', 'August', 'September', 'October', 'November', 'December'];
+    const tempMonthName = monthNames[date.getMonth() - 1 ];
+    this.dateDD.push({
+      value: { year: +tempYear, month: +tempMonth, day: +tempDay },
+      display: tempMonthName.concat(' - ' , tempYear),
+      id: index,
+    });
+  }
+
+  buildDropDown() {
+    let zeroDate = new Date('04-01-2020');
+    const nowDate = new Date();
+    let i = 0;
+    while (zeroDate < nowDate) {
+      zeroDate = new Date(zeroDate.setMonth(zeroDate.getMonth() + 1));
+      this.formatDates(zeroDate, i);
+      i++;
+    }
+  }
+
+
   preFilter() {
+    console.log('pre filter', this.dateFrom, this.dateTo);
     if (this.dateFrom) {
       let f_date: any;
       const f_string = this.dateFrom.month.toString();
@@ -200,6 +212,7 @@ export class ReportComponent implements OnInit {
       this.showGoodLad ||
       this.showHoward ||
       this.showHoward ||
+      this.showRefund ||
       this.hideDetails ||
       this.selectedToDate ||
       this.selectedFromDate
@@ -213,7 +226,7 @@ export class ReportComponent implements OnInit {
   }
   formatDate(temp: string) {
     const tmp = temp.split('/');
-    const date = tmp[1] + '/' + tmp[0] + '/' + tmp[2];
+    const date = tmp[0] + '/' + tmp[1] + '/' + tmp[2];
     return new Date(date).getTime();
   }
 
@@ -223,14 +236,14 @@ export class ReportComponent implements OnInit {
     if (this.selectedFromDate) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
         return +this.formatDate(fullText.OrderDate) >= +this.selectedFromDate ||
-        fullText.OrderDate === 'Total';
+          fullText.OrderDate === 'Total';
       });
     }
 
     if (this.selectedToDate) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
         return +this.formatDate(fullText.OrderDate) <= +this.selectedToDate ||
-        fullText.OrderDate === 'Total';
+          fullText.OrderDate === 'Total';
       });
     }
 
@@ -265,21 +278,34 @@ export class ReportComponent implements OnInit {
         );
       });
     }
+
+    if (this.showRefund) {
+      this.filteredText = this.filteredText.filter((fullText: any) => {
+        return (
+          fullText.FoldStore === 'REFUND'
+        );
+      });
+    }
+
     if (this.hideDetails) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
         return fullText.OrderDate === 'Total';
       });
     }
+
+ //   this.calculateTotals();
   }
 
   resetFilters() {
-    this.dateFrom = this.lastMonth;
+    this.dateFrom = this.calendar.getToday();
+    this.dateFrom.day = 1;
     this.dateTo = this.calendar.getToday();
-    this.hideDetails = false;
+    this.hideDetails = true;
     this.showBrooklyn = false;
     this.showGoodLad = false;
     this.showWest = false;
     this.showHoward = false;
+    this.showRefund = false;
     this.preFilter();
   }
 

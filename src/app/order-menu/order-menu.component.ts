@@ -44,6 +44,7 @@ export class OrderMenuComponent implements OnInit {
   oldTo: any;
   outstanding = false;
   shipped = false;
+  shipLOCK = false;
   closeResult: string;
   filteredText: any;
   tempSplit: any[] = [];
@@ -131,21 +132,25 @@ export class OrderMenuComponent implements OnInit {
       });
   }
 
-  getFold(CheckId) {
-    this.spinner.show();
-    this.service.getFolds(CheckId).subscribe(
-      (check: any[]) => {
-        if (check) {
-          this.oldReport = check;
-          console.log(this.oldReport);
-          this.spinner.hide();
-        }
-      },
-      error => {
-        this.errors = error;
-        console.log(this.errors);
-      }
-    );
+  getFold(rowIndex) {
+//    console.log(rowIndex);
+    // this.spinner.show();
+    this.oldReport = this.filteredText[rowIndex];
+  //  console.log(this.oldReport);
+    // console.log(136, CheckId);
+    // this.service.getFolds(CheckId).subscribe(
+    //   (check: any[]) => {
+    //     if (check) {
+    //       this.oldReport = check;
+    //       console.log(this.oldReport);
+    //       this.spinner.hide();
+    //     }
+    //   },
+    //   error => {
+    //     this.errors = error;
+    //     console.log(this.errors);
+    //   }
+    // );
   }
 
   clearOldReport() {
@@ -159,11 +164,11 @@ export class OrderMenuComponent implements OnInit {
       ShippingCost: this.oldReport.FoldShippingCost,
       Paypal: this.oldReport.FoldPaypal,
     });
-    console.log(this.newCost);
-    this.service.updateCost( this.oldReport.OrderId, this.newCost)
+  //  console.log(this.newCost);
+    this.service.updateCost( this.oldReport.OrderNumber, this.newCost)
       .subscribe((cat: any) => {
         this.refreshData();
-        console.log(cat);
+    //    console.log(cat);
       },
         (err) => {
           console.log(err);
@@ -249,7 +254,7 @@ export class OrderMenuComponent implements OnInit {
 
   formatDate(temp: string) {
     const tmp = temp.split('/');
-    const date = tmp[1] + '/' + tmp[0] + '/' + tmp[2];
+    const date = tmp[0] + '/' + tmp[1] + '/' + tmp[2];
     return new Date(date).getTime();
   }
 
@@ -266,27 +271,28 @@ export class OrderMenuComponent implements OnInit {
     if (this.MultiOrders) {
       for (let n = 0; n < this.MultiOrders.length; n++) {
         const ordered = this.MultiOrders[n].ItemId;
+        let temp;
         this.captures = [];
-        if (this.MultiOrders[n].Brooklyn >= ordered && this.MultiOrders[n].ItemSKU !== 'Total') {
-          const temp = this.StoreList('Brooklyn', this.MultiOrders[n].Brooklyn, this.MultiOrders[n].ItemSKU);
-          this.MultiOrders[n].Store = temp;
-        }
-        if (this.MultiOrders[n].GoodLad >= ordered) {
-          const temp = this.StoreList('GoodLad', this.MultiOrders[n].GoodLad, this.MultiOrders[n].ItemSKU);
-          this.MultiOrders[n].Store = temp;
-        }
-        if (this.MultiOrders[n].Howard >= ordered) {
-          const temp = this.StoreList('Howard', this.MultiOrders[n].Howard, this.MultiOrders[n].ItemSKU);
-          this.MultiOrders[n].Store = temp;
-        }
-        if (this.MultiOrders[n].West >= ordered) {
-          const temp = this.StoreList('West', this.MultiOrders[n].West, this.MultiOrders[n].ItemSKU);
-          this.MultiOrders[n].Store = temp;
-        }
-        if (this.captures.length < 1) {
-          const temp = this.StoreList('Not In Stock', 0, this.MultiOrders[n].ItemSKU);
-          this.MultiOrders[n].Store = temp;
-        }
+      //  if (this.MultiOrders[n].Brooklyn >= ordered && this.MultiOrders[n].ItemSKU !== 'Total') {
+        temp = this.StoreList('Brooklyn', this.MultiOrders[n].Brooklyn, this.MultiOrders[n].ItemSKU);
+        this.MultiOrders[n].Store = temp;
+      //  }
+      //  if (this.MultiOrders[n].GoodLad >= ordered) {
+        temp = this.StoreList('GoodLad', this.MultiOrders[n].GoodLad, this.MultiOrders[n].ItemSKU);
+        this.MultiOrders[n].Store = temp;
+      //  }
+      //  if (this.MultiOrders[n].Howard >= ordered) {
+        temp = this.StoreList('Howard', this.MultiOrders[n].Howard, this.MultiOrders[n].ItemSKU);
+        this.MultiOrders[n].Store = temp;
+      //  }
+      //  if (this.MultiOrders[n].West >= ordered) {
+        temp = this.StoreList('West', this.MultiOrders[n].West, this.MultiOrders[n].ItemSKU);
+        this.MultiOrders[n].Store = temp;
+      //  }
+      //  if (this.captures.length < 1) {
+        temp = this.StoreList('Not In Stock', 0, this.MultiOrders[n].ItemSKU);
+        this.MultiOrders[n].Store = temp;
+       // }
       }
     }
   }
@@ -315,7 +321,8 @@ export class OrderMenuComponent implements OnInit {
     }
     if (this.shipped) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
-        return !fullText.FoldShippingCost;
+        return !fullText.FoldShippingCost &&
+              fullText.FoldShippingCost !== 0;
       });
     }
     if (this.searchText) {
@@ -324,12 +331,18 @@ export class OrderMenuComponent implements OnInit {
   }
 
   getOrder(orderid: string) {
+    console.log(orderid);
     let orderAddress = 'https://thefoldgroup.myshopify.com/admin/orders/';
     orderAddress = orderAddress.concat(orderid);
     window.open(orderAddress, '_blank');
   }
 
   openComments(comments, i: any, ) {
+    console.log(i);
+    this.shipLOCK = false;
+    if (i.FoldShippingCost || i.FoldShippingCost === 0) {
+      this.shipLOCK = true;
+    }
     this.splitTotal = [];
     this.ReadyForPost = false;
     this.tempSplit = [];
@@ -348,7 +361,7 @@ export class OrderMenuComponent implements OnInit {
     this.service.CTGetMultiOrders_Static(i.OrderNumber)
         .subscribe((cat: any) => {
           (this.MultiOrders = cat);
-          console.log(this.MultiOrders);
+       //   console.log(this.MultiOrders);
           this.getStore();
           this.spinner.hide();
         },
@@ -408,10 +421,13 @@ export class OrderMenuComponent implements OnInit {
 
   // get the list of registers and SKU numbers
   StoreSplit(store: string, sku: string) {
+    const stock = store.substring(0, 1);
+    console.log(stock);
     const n = store.indexOf('-') + 2;
     store = store.substring(n);
-    if (store === 'Not In Stock') {
+    if (store === 'Not In Stock' || stock === '0' ) {
       store = 'REFUND';
+      console.log(store);
     }
     if (this.tempSplit.find(s => s.SKU === sku)) {
       let i = 0;
@@ -436,9 +452,9 @@ export class OrderMenuComponent implements OnInit {
   }
 
   onProdSelect(args) {
-//    if (args.target.value !== 0 && !this.Allocated && args.target.options[args.target.selectedIndex].text !== '0 - Not In Stock') {
+    if (args.target.value !== '9999' && !this.shipLOCK) {
       this.StoreSplit(args.target.options[args.target.selectedIndex].text, args.target.value);
- //   }
+    }
   }
 
   getCurrent() {
@@ -461,7 +477,6 @@ export class OrderMenuComponent implements OnInit {
     this.service.CTGetVendID(this.OrderNo)
       .subscribe((cat: any) => {
         (VendId = cat);
-        console.log(VendId);
         this.spinner.hide();
         let orderAddress = 'https://thefold.vendhq.com/history#';
         orderAddress = orderAddress.concat(VendId);
@@ -483,6 +498,7 @@ export class OrderMenuComponent implements OnInit {
     // Loop through the Order and remove Products that is not linked to the specific store
   //  targetStore = 'Brooklyn';
   this.spinner.show();
+  this.Allocated = false;
   let i = 0;
   let stores = 0;
   this.service.CTGetVendOrder(this.OrderNo)
@@ -601,10 +617,9 @@ export class OrderMenuComponent implements OnInit {
     for (let n = 0; n < this.splitTotal.length; n++) {
       this.VendMaster.note = 'Order_Test_Shopify';
     }
-    console.log(this.splitTotal);
+  //  console.log(this.splitTotal);
     this.service.CTUpdateVendOrder(this.OrderNo, this.splitTotal)
       .subscribe((cat: any) => {
-        console.log(cat);
         this.refresh();
         this.spinner.hide();
       },
