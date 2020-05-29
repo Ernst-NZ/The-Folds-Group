@@ -51,9 +51,19 @@
       </div>
     </div>
   </div>
+
   <div class='row fontBlack' style='padding-top: 5px; text-align: center;'>
-    <div class='col-sm-2 center'></div>
-    <div class='col-sm-3'>
+    <div class='col-sm-4 center'></div>
+    <div class='col-sm-2 center'>
+      <label class='bu' style='margin-bottom: 0px;'>
+        View month:
+      </label>
+      <select class="custom-select" style="width: 100%" name="Id" (change)='onMonthSelect($event)' >
+        <option *ngIf='this.dateDD' [value]="9999">-Select Month-</option>
+        <option *ngFor="let s of dateDD" [value]="s.id">{{ s.display}}</option>
+      </select>
+    </div>
+    <!-- <div class='col-sm-3'>
       <label class='bu' style='margin-bottom: 0px;'>
         From Date:
       </label>
@@ -61,7 +71,7 @@
         <input class="form-control" placeholder="dd-mm-yyyy" name="dpFrom" [(ngModel)]="dateFrom" ngbDatepicker
           #dpFrom="ngbDatepicker" (closed)="preFilter()">
         <div class="input-group-append">
-          <button class="btn btn-outline-secondary" (click)="dpFrom.toggle(); preDate()" type="button">📅</button>
+          <button class="btn btn-outline-secondary" (click)="dpFrom.toggle(); getDateData()" type="button">📅</button>
         </div>
       </div>
     </div>
@@ -73,10 +83,10 @@
         <input class="form-control" placeholder="dd-mm-yyyy" name="dpTo" [(ngModel)]="dateTo" ngbDatepicker
           #dpTo="ngbDatepicker" (closed)="preFilter()">
         <div class="input-group-append">
-          <button class="btn btn-outline-secondary" (click)="dpTo.toggle(); preDate()" type="button">📅</button>
+          <button class="btn btn-outline-secondary" (click)="dpTo.toggle(); getDateData()" type="button">📅</button>
         </div>
       </div>
-    </div>
+    </div> -->
 
 
     <div class='col-sm-2'><label class='bu' style='margin-bottom: 0px;'>
@@ -84,6 +94,7 @@
     </label><br>
     <button type="button" class="btn btn-sm btn-info" (click)="resetFilters()">Clear All Filters</button>
   </div>
+  <div class='col-sm-4 center'></div>
   </div>
 
 

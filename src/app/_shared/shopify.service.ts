@@ -69,11 +69,13 @@ export class ShopifyService {
     return this.http.put(this.rootURL + '/VendTest/' + orderNO,   splitTotal);
   }
 
-  SPGetCostReport() {
-    return this.http.get(this.rootURL + '/CostReport/');
+  SPGetCostReport(dateSet: any) {
+    console.log(dateSet);
+    return this.http.put(this.rootURL + '/CostReport/' + '1', dateSet);
   }
 
   getFolds(FoldId: number) {
+    console.log('Service Get Fold', FoldId)
     return this.http.get(this.rootURL + '/Folds/' + FoldId);
   }
 
@@ -92,6 +94,7 @@ export class ShopifyService {
   }
 
   testPut(orderNo: string,  editFold: any) {
-    return this.http.put(this.rootURL + '/UpdateCost/' + orderNo,   editFold);
+    console.log('xxxxxxxxxxxxx', editFold);
+    return this.http.put(this.rootURL + '/VendTest/' + orderNo,   editFold);
   }
 }

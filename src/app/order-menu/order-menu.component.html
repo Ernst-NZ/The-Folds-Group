@@ -80,8 +80,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let pak of this.filteredText; let i = index" [attr.data-index]="i" [attr.data-id]="pak.FoldId"
-          [ngClass]="(pak.FoldStatus)?'fontBlack':'fontRed'">
+        <tr *ngFor="let pak of this.filteredText; let i = index" [attr.data-index]="i"
+          [ngClass]="(pak.FoldStore == 'REFUND')?'fontMaroonBold':'fontBlack'">
           <td>
             <button *ngIf='!pak.FoldStatus && (pak.FoldStore !== "NO SKU" && pak.FoldStore !== "Multiple Stores" )'
               class="btn btn-warning btn-small btn-block" (click)="getOrder(pak.OrderId)"
@@ -121,12 +121,12 @@
             ${{ pak.OrderTotal}}
           </td>
           <td>
-            <input type="text" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldPaypal"
+            <input type="number" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldPaypal"
                 class="form-control" style="margin-bottom: 0px; border-radius: 5px; max-width: 100px; " />
               <span *ngIf="!pak.editing">${{ pak.FoldPaypal }}</span>
           </td>
           <td>
-            <input type="text" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldShippingCost"
+            <input type="number" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldShippingCost"
                 class="form-control" style="margin-bottom: 0px; border-radius: 5px; max-width: 100px; " />
               <span *ngIf="!pak.editing">${{ pak.FoldShippingCost }}</span>
           </td>
@@ -138,7 +138,7 @@
               <button class="btn btn-success btn-sm" *ngIf="pak.editing"
               (click)="updateFold();pak.editing=false">Update</button>
             <button class="btn btn-info btn-sm" *ngIf="!pak.editing"
-              (click)="pak.editing=true; getFold(pak.FoldId);">Edit</button>
+              (click)="pak.editing=true; getFold(i);">Edit</button>
               <button class="btn btn-secondary btn-sm" *ngIf="pak.editing"
               (click)="pak.editing=false">Cancel</button>
           </div>
@@ -196,16 +196,19 @@
         </td>
         <td>
           <select *ngIf='pak.ItemSKU != "Total"' class="custom-select" style="width: 100%" name="Id" (change)='onProdSelect($event)' >
-            <option *ngIf='!this.Allocated' [value]="0">-Select Store-</option>
+            <option *ngIf='!this.Allocated' [value]="9999">-Select Store-</option>
+            <option *ngIf='this.Allocated' [value]="9999">Allocated to: {{this.allocatedStore}}</option>
             <option *ngFor="let s of pak.Store" [value]="s.SKU">{{ s.Stock }} - {{ s.Store}}</option>
           </select>
-          <!-- <label  *ngIf='pak.ItemSKU === "Total"' >{{ this.tempSplit.length }}</label> -->
         </td>
         <td>
           {{ pak.LastSale }}
         </td>
       </tr>
-      <tr *ngIf='this.Allocated'>
+      <tr *ngIf='this.shipLOCK' class="fontMaroonBold">
+        <td colspan="4" style="text-align: center;">Shipping Cost has already been allocated for this order</td>
+      </tr>
+      <tr *ngIf='this.Allocated || !this.shipLOCK'>
         <td colspan="4" style="text-align: center;">
         <span style="text-align: center;" [innerHTML]="FoldComments"></span>
       </td>
@@ -248,7 +251,7 @@
         <button *ngIf='this.tempSplit.length === OrderItemTotal && !pak.Processed && pak.Store !="REFUND"' class="btn btn-info btn-small"
               (click)="testSingle(pak.Store)" style='text-align: left;'>Confirm Order</button>
               <button *ngIf='this.tempSplit.length === OrderItemTotal && !pak.Processed  && pak.Store ==="REFUND"' class="btn btn-danger btn-small"
-              (click)="testSingle(pak.Store)" style='text-align: left;'>Confirm Order</button>
+              (click)="testSingle(pak.Store)" style='text-align: left;'>REFUND Order</button>
         <span *ngIf='pak.Processed'>{{ pak.Processed }}</span>
       </td>
     </tr>
