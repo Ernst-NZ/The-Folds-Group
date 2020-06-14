@@ -166,7 +166,7 @@
   <div class="modal-body appBackGround">
     <div>
       <button class="btn btn-info btn-small btn-block center"
-      (click)="openVend()" style='text-align: center; max-width: 250px; margin: auto; '>Open Vend Order</button>
+      (click)="openVend(); modal.dismiss()" style='text-align: center; max-width: 250px; margin: auto; '>Open Vend Order</button>
     </div>
     <div *ngIf='this.Allocated === true' style="text-align: center; color: black; font-size: 1em; font-weight: bold; text-decoration: underline;">
       <span>This Order has been allocated to: {{this.allocatedStore}}</span>
