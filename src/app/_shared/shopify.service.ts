@@ -70,12 +70,10 @@ export class ShopifyService {
   }
 
   SPGetCostReport(dateSet: any) {
-    console.log(dateSet);
     return this.http.put(this.rootURL + '/CostReport/' + '1', dateSet);
   }
 
   getFolds(FoldId: number) {
-    console.log('Service Get Fold', FoldId)
     return this.http.get(this.rootURL + '/Folds/' + FoldId);
   }
 

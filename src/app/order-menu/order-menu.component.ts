@@ -338,7 +338,6 @@ export class OrderMenuComponent implements OnInit {
   }
 
   openComments(comments, i: any, ) {
-    console.log(i);
     this.shipLOCK = false;
     if (i.FoldShippingCost || i.FoldShippingCost === 0) {
       this.shipLOCK = true;
@@ -422,12 +421,10 @@ export class OrderMenuComponent implements OnInit {
   // get the list of registers and SKU numbers
   StoreSplit(store: string, sku: string) {
     const stock = store.substring(0, 1);
-    console.log(stock);
     const n = store.indexOf('-') + 2;
     store = store.substring(n);
     if (store === 'Not In Stock' || stock === '0' ) {
       store = 'REFUND';
-      console.log(store);
     }
     if (this.tempSplit.find(s => s.SKU === sku)) {
       let i = 0;
@@ -478,6 +475,7 @@ export class OrderMenuComponent implements OnInit {
       .subscribe((cat: any) => {
         (VendId = cat);
         this.spinner.hide();
+        console.log(VendId);
         let orderAddress = 'https://thefold.vendhq.com/history#';
         orderAddress = orderAddress.concat(VendId);
         window.open(orderAddress, '_blank');

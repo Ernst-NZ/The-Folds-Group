@@ -54,10 +54,11 @@ export class ReportComponent implements OnInit {
     this.spinner.show();
     this.dateFrom = this.calendar.getToday();
     const lastDay = function(y , m) {
-      return  new Date(y, m + 1, 0).getDate();
+    //  console.log(y, m);
+      return  new Date(y, m, 0).getDate();
       };
     let endOfMonth = 1;
-    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month + 1);
+    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month);
     this.dateTo = { year: +this.dateFrom.year, month: +this.dateFrom.month , day: +endOfMonth };
     this.dateFrom.day = 1;
     this.getDateData();
@@ -70,11 +71,10 @@ export class ReportComponent implements OnInit {
 
 
   async getDateData() {
-    console.log('pre data', this.dateFrom, this.dateTo);
+  //  console.log('pre data', this.dateFrom, this.dateTo);
     this.spinner.show();
     await this.delay(1000);
     this.filterDate = [];
-    console.log('pre data', this.dateFrom, this.dateTo);
     let tempFrom = this.dateFrom.month.toString();
     tempFrom = tempFrom.concat('/', this.dateFrom.day.toString(), '/', this.dateFrom.year.toString());
     let tempTo = this.dateTo.month.toString();
@@ -114,7 +114,7 @@ export class ReportComponent implements OnInit {
     i = args.target.value;
     let endOfMonth = 1;
     this.dateFrom = this.dateDD[i]['value'];
-    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month + 1);
+    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month -1);
     this.dateTo = { year: +this.dateFrom.year, month: +this.dateFrom.month , day: +endOfMonth };
     this.getDateData();
   }
@@ -180,7 +180,7 @@ export class ReportComponent implements OnInit {
 
 
   preFilter() {
-    console.log('pre filter', this.dateFrom, this.dateTo);
+//    console.log('pre filter', this.dateFrom, this.dateTo);
     if (this.dateFrom) {
       let f_date: any;
       const f_string = this.dateFrom.month.toString();
