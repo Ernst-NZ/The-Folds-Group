@@ -22,6 +22,8 @@ export class ReportComponent implements OnInit {
   dateTo: NgbDateStruct;
   date: { year: number; month: number };
   report: Array<ICostReport> = [];
+  outstanding: Array<any> = [];
+  filteredOut: any;
   newReport: ICostReport = new CostReport();
   oldReport: any;
   filteredText: any;
@@ -40,6 +42,8 @@ export class ReportComponent implements OnInit {
   showRefund = false;
   dateDD: any[] = [];
   filterDate: any[] = [];
+  displayFrom: string;
+  displayTo: string;
 
   constructor(
     service: ShopifyService,
@@ -75,6 +79,8 @@ export class ReportComponent implements OnInit {
     this.spinner.show();
     await this.delay(1000);
     this.filterDate = [];
+    this.report = [];
+    this.outstanding = [];
     let tempFrom = this.dateFrom.month.toString();
     tempFrom = tempFrom.concat('/', this.dateFrom.day.toString(), '/', this.dateFrom.year.toString());
     let tempTo = this.dateTo.month.toString();
@@ -83,6 +89,8 @@ export class ReportComponent implements OnInit {
       fromDate: tempFrom,
       toDate: tempTo,
     });
+    this.displayFrom = tempFrom;
+    this.displayTo = tempTo;
     this.service.SPGetCostReport(this.filterDate)
     .subscribe((cat: ICostReport[]) => {
       (this.report = cat);
@@ -102,6 +110,26 @@ export class ReportComponent implements OnInit {
         this.spinner.hide();
       });
 
+      // Get Outstanding data
+    this.service.SPGetCostOutstanding(this.filterDate)
+    .subscribe((cat: any) => {
+      (this.outstanding = cat);
+      for (const order of this.outstanding) {
+        let endInt = 0;
+        if (order.OrderDate !== 'Total') {
+          endInt = order.OrderDate.indexOf(' ');
+          order.OrderDate = order.OrderDate.substring(0, endInt);
+        }
+      }
+      this.filteredOut = this.outstanding;
+      this.preFilter();
+      this.spinner.hide();
+    },
+      (err) => {
+        console.log(err);
+        this.spinner.hide();
+      });
+
   }
 
   onMonthSelect(args) {
@@ -113,8 +141,8 @@ export class ReportComponent implements OnInit {
     let i = null;
     i = args.target.value;
     let endOfMonth = 1;
-    this.dateFrom = this.dateDD[i]['value'];
-    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month -1);
+    this.dateFrom = this.dateDD[i].value;
+    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month - 1);
     this.dateTo = { year: +this.dateFrom.year, month: +this.dateFrom.month , day: +endOfMonth };
     this.getDateData();
   }
@@ -221,6 +249,7 @@ export class ReportComponent implements OnInit {
     } else {
       console.log('NO Filter');
       this.filteredText = this.report;
+      this.filteredOut = this.outstanding;
     }
 
   }
@@ -232,9 +261,14 @@ export class ReportComponent implements OnInit {
 
   async filterPromise(): Promise<void> {
     this.filteredText = this.report;
+    this.filteredOut = this.outstanding;
 
     if (this.selectedFromDate) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
+        return +this.formatDate(fullText.OrderDate) >= +this.selectedFromDate ||
+          fullText.OrderDate === 'Total';
+      });
+      this.filteredOut = this.filteredOut.filter((fullText: any) => {
         return +this.formatDate(fullText.OrderDate) >= +this.selectedFromDate ||
           fullText.OrderDate === 'Total';
       });
@@ -245,10 +279,19 @@ export class ReportComponent implements OnInit {
         return +this.formatDate(fullText.OrderDate) <= +this.selectedToDate ||
           fullText.OrderDate === 'Total';
       });
+      this.filteredOut = this.filteredOut.filter((fullText: any) => {
+        return +this.formatDate(fullText.OrderDate) <= +this.selectedToDate ||
+          fullText.OrderDate === 'Total';
+      });
     }
 
     if (this.showGoodLad) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
+        return (
+          fullText.FoldStore === 'GoodLad'
+        );
+      });
+      this.filteredOut = this.filteredOut.filter((fullText: any) => {
         return (
           fullText.FoldStore === 'GoodLad'
         );
@@ -261,10 +304,20 @@ export class ReportComponent implements OnInit {
           fullText.FoldStore === 'Howard'
         );
       });
+      this.filteredOut = this.filteredOut.filter((fullText: any) => {
+        return (
+          fullText.FoldStore === 'Howard'
+        );
+      });
     }
 
     if (this.showWest) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
+        return (
+          fullText.FoldStore === 'West'
+        );
+      });
+      this.filteredOut = this.filteredOut.filter((fullText: any) => {
         return (
           fullText.FoldStore === 'West'
         );
@@ -277,10 +330,20 @@ export class ReportComponent implements OnInit {
           fullText.FoldStore === 'Brooklyn'
         );
       });
+      this.filteredOut = this.filteredOut.filter((fullText: any) => {
+        return (
+          fullText.FoldStore === 'Brooklyn'
+        );
+      });
     }
 
     if (this.showRefund) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
+        return (
+          fullText.FoldStore === 'REFUND'
+        );
+      });
+      this.filteredOut = this.filteredOut.filter((fullText: any) => {
         return (
           fullText.FoldStore === 'REFUND'
         );
@@ -291,9 +354,11 @@ export class ReportComponent implements OnInit {
       this.filteredText = this.filteredText.filter((fullText: any) => {
         return fullText.OrderDate === 'Total';
       });
+      this.filteredOut = this.filteredOut.filter((fullText: any) => {
+        return fullText.OrderDate === 'Total';
+      });
     }
-
- //   this.calculateTotals();
+    console.log(this.filteredOut);
   }
 
   resetFilters() {
@@ -308,6 +373,4 @@ export class ReportComponent implements OnInit {
     this.showRefund = false;
     this.preFilter();
   }
-
-
 }

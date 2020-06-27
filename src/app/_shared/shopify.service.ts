@@ -73,6 +73,10 @@ export class ShopifyService {
     return this.http.put(this.rootURL + '/CostReport/' + '1', dateSet);
   }
 
+  SPGetCostOutstanding(dateSet: any) {
+    return this.http.put(this.rootURL + '/CostOutstanding/' + '1', dateSet);
+  }
+
   getFolds(FoldId: number) {
     return this.http.get(this.rootURL + '/Folds/' + FoldId);
   }
