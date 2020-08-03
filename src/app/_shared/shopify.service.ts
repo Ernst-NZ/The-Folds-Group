@@ -52,6 +52,10 @@ export class ShopifyService {
     return this.http.get<any>(this.rootURL + '/MultiStore_Static/' + OrderNo);
   }
 
+  SPGetAllocatedOrder(OrderNo: string): Observable<any> {
+    return this.http.get<any>(this.rootURL + '/SPGetAllocatedOrder/' + OrderNo);
+  }
+
   CTGetVendID(OrderNo: string): Observable<string> {
     return this.http.get<string>(this.rootURL + '/OpenVend/' + OrderNo);
   }
