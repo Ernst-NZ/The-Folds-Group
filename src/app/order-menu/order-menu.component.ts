@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ɵConsole } from '@angular/core';
 import {
   IShopOrders,
   ShopOrders,
@@ -401,8 +401,9 @@ export class OrderMenuComponent implements OnInit {
           console.log('Item not found', n, tempList['ItemSKU']);
         }
       }
+      this.MultiOrders =  this.newSplit;
     }
-    this.MultiOrders =  this.newSplit;
+    
   }
 
   openComments(comments, i: any) {
@@ -449,6 +450,25 @@ export class OrderMenuComponent implements OnInit {
         this.getStore();
         const temp = cat;
         this.xx(temp);
+
+        console.log(this.MultiOrders)
+        this.modalService
+          .open(comments, { ariaLabelledBy: 'modal-basic-title' })
+          .result.then(
+            (result) => {
+              this.closeResult = `Closed with: ${result}`;
+              this.MultiOrders = '';
+              this.Allocated = false;
+            },
+            (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+              this.MultiOrders = '';
+              this.Allocated = false;
+            }
+          );
+
+
+
         this.spinner.hide();
       },
       (err) => {
@@ -457,21 +477,21 @@ export class OrderMenuComponent implements OnInit {
       }
     );
     
-
-    this.modalService
-      .open(comments, { ariaLabelledBy: 'modal-basic-title' })
-      .result.then(
-        (result) => {
-          this.closeResult = `Closed with: ${result}`;
-          this.MultiOrders = '';
-          this.Allocated = false;
-        },
-        (reason) => {
-          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-          this.MultiOrders = '';
-          this.Allocated = false;
-        }
-      );
+    // console.log(this.MultiOrders)
+    // this.modalService
+    //   .open(comments, { ariaLabelledBy: 'modal-basic-title' })
+    //   .result.then(
+    //     (result) => {
+    //       this.closeResult = `Closed with: ${result}`;
+    //       this.MultiOrders = '';
+    //       this.Allocated = false;
+    //     },
+    //     (reason) => {
+    //       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    //       this.MultiOrders = '';
+    //       this.Allocated = false;
+    //     }
+    //   );
   }
 
   private getDismissReason(reason: any): string {
