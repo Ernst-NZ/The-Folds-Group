@@ -52,6 +52,10 @@ export class ShopifyService {
     return this.http.get<any>(this.rootURL + '/MultiStore_Static/' + OrderNo);
   }
 
+  SPGetAllocatedOrder(OrderNo: string): Observable<any> {
+    return this.http.get<any>(this.rootURL + '/SPGetAllocatedOrder/' + OrderNo);
+  }
+
   CTGetVendID(OrderNo: string): Observable<string> {
     return this.http.get<string>(this.rootURL + '/OpenVend/' + OrderNo);
   }
@@ -71,6 +75,10 @@ export class ShopifyService {
 
   SPGetCostReport(dateSet: any) {
     return this.http.put(this.rootURL + '/CostReport/' + '1', dateSet);
+  }
+
+  SPGetCostOutstanding(dateSet: any) {
+    return this.http.put(this.rootURL + '/CostOutstanding/' + '1', dateSet);
   }
 
   getFolds(FoldId: number) {

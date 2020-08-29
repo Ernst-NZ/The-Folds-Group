@@ -134,5 +134,8 @@
       }
     }
   },
-  "defaultProject": "folds"
+  "defaultProject": "folds",
+  "cli": {
+    "analytics": false
+  }
 }

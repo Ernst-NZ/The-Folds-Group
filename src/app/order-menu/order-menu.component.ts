@@ -1,10 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { IShopOrders, ShopOrders, ICostReport, CostReport } from '../_shared/interfaces';
+import { Component, OnInit, ɵConsole } from '@angular/core';
+import {
+  IShopOrders,
+  ShopOrders,
+  ICostReport,
+  CostReport,
+} from '../_shared/interfaces';
 import { ShopifyService } from '../_shared/shopify.service';
 import { Globals } from '../globals';
 import { NgxSpinnerService } from 'ngx-spinner';
 import {
-  NgbDateStruct, NgbCalendar, NgbDateParserFormatter, NgbModal, ModalDismissReasons
+  NgbDateStruct,
+  NgbCalendar,
+  NgbDateParserFormatter,
+  NgbModal,
+  ModalDismissReasons,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateCustomParserFormatter } from 'src/app/_shared/dateformat';
 import { SorterService } from '../_shared/sorter.service';
@@ -12,19 +21,21 @@ import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { shareReplay, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { templateJitUrl } from '@angular/compiler';
 
 @Component({
   selector: 'app-order-menu',
   templateUrl: './order-menu.component.html',
   styleUrls: ['./order-menu.component.scss'],
   providers: [
-    { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter }
-  ]
+    { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
+  ],
 })
 export class OrderMenuComponent implements OnInit {
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+  isHandset$: Observable<boolean> = this.breakpointObserver
+    .observe(Breakpoints.Handset)
     .pipe(
-      map(result => result.matches),
+      map((result) => result.matches),
       shareReplay()
     );
   private service: ShopifyService;
@@ -51,7 +62,9 @@ export class OrderMenuComponent implements OnInit {
   splitTotal: any[] = [];
   captures: any[] = [];
   newFold: any[] = [];
+  allocatedOrder: any[] = [];
   newCost: any[] = [];
+  newSplit: any[] = [];
   searchText = '';
   allocatedStore = '';
   tempDate: number;
@@ -78,23 +91,24 @@ export class OrderMenuComponent implements OnInit {
     private calendar: NgbCalendar,
     private modalService: NgbModal,
     private sorterService: SorterService,
-    private http: HttpClient,
+    private http: HttpClient
   ) {
     this.service = service;
   }
 
   ngOnInit(): void {
     this.spinner.show();
-    this.service.SPGetOrders()
-      .subscribe((cat: IShopOrders[]) => {
-        (this.orderList = cat);
+    this.service.SPGetOrders().subscribe(
+      (cat: IShopOrders[]) => {
+        this.orderList = cat;
         this.filteredText = this.orderList;
         this.spinner.hide();
       },
-        (err) => {
-          console.log(err);
-          this.spinner.hide();
-        });
+      (err) => {
+        console.log(err);
+        this.spinner.hide();
+      }
+    );
 
     const tempYear = new Date().getFullYear();
     const tempMonth = new Date().getMonth();
@@ -116,27 +130,28 @@ export class OrderMenuComponent implements OnInit {
   refreshData() {
     this.spinner.show();
     this.newCost = [];
-    this.service.SPGetOrders()
-    .subscribe((cat: IShopOrders[]) => {
-      (this.orderList = cat);
-      this.filteredText = this.orderList;
-      this.preFilter();
-      if (this.searchText) {
-        this.filter(this.searchText);
-      }
-      this.spinner.hide();
-    },
+    this.service.SPGetOrders().subscribe(
+      (cat: IShopOrders[]) => {
+        this.orderList = cat;
+        this.filteredText = this.orderList;
+        this.preFilter();
+        if (this.searchText) {
+          this.filter(this.searchText);
+        }
+        this.spinner.hide();
+      },
       (err) => {
         console.log(err);
         this.spinner.hide();
-      });
+      }
+    );
   }
 
   getFold(rowIndex) {
-//    console.log(rowIndex);
+    //    console.log(rowIndex);
     // this.spinner.show();
     this.oldReport = this.filteredText[rowIndex];
-  //  console.log(this.oldReport);
+    //  console.log(this.oldReport);
     // console.log(136, CheckId);
     // this.service.getFolds(CheckId).subscribe(
     //   (check: any[]) => {
@@ -164,15 +179,16 @@ export class OrderMenuComponent implements OnInit {
       ShippingCost: this.oldReport.FoldShippingCost,
       Paypal: this.oldReport.FoldPaypal,
     });
-  //  console.log(this.newCost);
-    this.service.updateCost( this.oldReport.OrderNumber, this.newCost)
-      .subscribe((cat: any) => {
+    //  console.log(this.newCost);
+    this.service.updateCost(this.oldReport.OrderNumber, this.newCost).subscribe(
+      (cat: any) => {
         this.refreshData();
-    //    console.log(cat);
+        //    console.log(cat);
       },
-        (err) => {
-          console.log(err);
-        });
+      (err) => {
+        console.log(err);
+      }
+    );
   }
 
   filter(event) {
@@ -183,12 +199,12 @@ export class OrderMenuComponent implements OnInit {
           fullText.OrderNumber.toLowerCase().indexOf(data.toLowerCase()) > -1 ||
           fullText.OrderDate.toLowerCase().indexOf(data.toLowerCase()) > -1 ||
           fullText.OrderCustomer.toLowerCase().indexOf(data.toLowerCase()) >
-          -1 ||
-          fullText.FoldStatus.toLowerCase().indexOf(data.toLowerCase()) >
-          -1 ||
-          fullText.FoldStore.toLowerCase().indexOf(data.toLowerCase()) > -1
-          ||
-          fullText.OrderTotal.toString().toLowerCase().indexOf(data.toLowerCase()) > -1 ||
+            -1 ||
+          fullText.FoldStatus.toLowerCase().indexOf(data.toLowerCase()) > -1 ||
+          fullText.FoldStore.toLowerCase().indexOf(data.toLowerCase()) > -1 ||
+          fullText.OrderTotal.toString()
+            .toLowerCase()
+            .indexOf(data.toLowerCase()) > -1 ||
           fullText.FoldComments.toLowerCase().indexOf(data.toLowerCase()) > -1
         );
       });
@@ -273,26 +289,42 @@ export class OrderMenuComponent implements OnInit {
         const ordered = this.MultiOrders[n].ItemId;
         let temp;
         this.captures = [];
-      //  if (this.MultiOrders[n].Brooklyn >= ordered && this.MultiOrders[n].ItemSKU !== 'Total') {
-        temp = this.StoreList('Brooklyn', this.MultiOrders[n].Brooklyn, this.MultiOrders[n].ItemSKU);
+        //  if (this.MultiOrders[n].Brooklyn >= ordered && this.MultiOrders[n].ItemSKU !== 'Total') {
+        temp = this.StoreList(
+          'Brooklyn',
+          this.MultiOrders[n].Brooklyn,
+          this.MultiOrders[n].ItemSKU
+        );
         this.MultiOrders[n].Store = temp;
-      //  }
-      //  if (this.MultiOrders[n].GoodLad >= ordered) {
-        temp = this.StoreList('GoodLad', this.MultiOrders[n].GoodLad, this.MultiOrders[n].ItemSKU);
+        //  }
+        //  if (this.MultiOrders[n].GoodLad >= ordered) {
+        temp = this.StoreList(
+          'GoodLad',
+          this.MultiOrders[n].GoodLad,
+          this.MultiOrders[n].ItemSKU
+        );
         this.MultiOrders[n].Store = temp;
-      //  }
-      //  if (this.MultiOrders[n].Howard >= ordered) {
-        temp = this.StoreList('Howard', this.MultiOrders[n].Howard, this.MultiOrders[n].ItemSKU);
+        //  }
+        //  if (this.MultiOrders[n].Howard >= ordered) {
+        temp = this.StoreList(
+          'Howard',
+          this.MultiOrders[n].Howard,
+          this.MultiOrders[n].ItemSKU
+        );
         this.MultiOrders[n].Store = temp;
-      //  }
-      //  if (this.MultiOrders[n].West >= ordered) {
-        temp = this.StoreList('West', this.MultiOrders[n].West, this.MultiOrders[n].ItemSKU);
+        //  }
+        //  if (this.MultiOrders[n].West >= ordered) {
+        temp = this.StoreList(
+          'West',
+          this.MultiOrders[n].West,
+          this.MultiOrders[n].ItemSKU
+        );
         this.MultiOrders[n].Store = temp;
-      //  }
-      //  if (this.captures.length < 1) {
+        //  }
+        //  if (this.captures.length < 1) {
         temp = this.StoreList('Not In Stock', 0, this.MultiOrders[n].ItemSKU);
         this.MultiOrders[n].Store = temp;
-       // }
+        // }
       }
     }
   }
@@ -321,8 +353,7 @@ export class OrderMenuComponent implements OnInit {
     }
     if (this.shipped) {
       this.filteredText = this.filteredText.filter((fullText: any) => {
-        return !fullText.FoldShippingCost &&
-              fullText.FoldShippingCost !== 0;
+        return !fullText.FoldShippingCost && fullText.FoldShippingCost !== 0;
       });
     }
     if (this.searchText) {
@@ -337,7 +368,46 @@ export class OrderMenuComponent implements OnInit {
     window.open(orderAddress, '_blank');
   }
 
-  openComments(comments, i: any, ) {
+  xx(tempList: any) {
+    if (this.Allocated) {
+      for (let n = 0; n < tempList.length; n++) {
+        console.log('tempList', tempList);
+        console.log(n, tempList[n]['ItemSKU']);
+        let xx = this.allocatedOrder.find(
+          (record) => record.FoldItemSKU === tempList[n]['ItemSKU']
+        );
+        if (xx) {
+          console.log(xx['FoldStore']);
+          if (xx['FoldStore'] !== this.allocatedStore) {
+            console.log('remove line ', n, tempList[n]['ItemSKU']);
+            // this.MultiOrders.splice(n, 1);           
+            //  tempList.splice(n, 1);
+
+          } else {
+            console.log('Store is the same', n, tempList[n]['ItemSKU']);
+            this.newSplit.push({
+              Store: tempList[n]['Store'],
+              ItemId: tempList[n]['ItemId'],
+              ItemSKU: tempList[n]['ItemSKU'],
+              LastSale: tempList[n]['LastSale'],
+              Brooklyn: tempList[n]['Brooklyn'],
+              GoodLad: tempList[n]['GoodLad'],
+              Howard: tempList[n]['Howard'],
+              West: tempList[n]['West'],
+            });
+            console.log('PUSH',n, this.newSplit);
+          }
+        } else {
+          console.log('Item not found', n, tempList['ItemSKU']);
+        }
+      }
+      this.MultiOrders =  this.newSplit;
+    }
+    
+  }
+
+  openComments(comments, i: any) {
+    this.newSplit = [];
     this.shipLOCK = false;
     if (i.FoldShippingCost || i.FoldShippingCost === 0) {
       this.shipLOCK = true;
@@ -348,41 +418,80 @@ export class OrderMenuComponent implements OnInit {
     this.OrderItemTotal = i.OrderItemTotal;
     this.OrderNo = i.OrderNumber;
     this.OrderId = i.OrderId;
+    this.spinner.show();
     this.allocatedStore = i.FoldStore;
-    if (i.FoldStatus !== 'Fulfilled' && (i.FoldStore !== 'NO SKU' && i.FoldStore !== 'Multiple Stores')) {
+    if (
+      i.FoldStatus !== 'Fulfilled' &&
+      i.FoldStore !== 'NO SKU' &&
+      i.FoldStore !== 'Multiple Stores'
+    ) {
       this.Allocated = true;
+      this.service.SPGetAllocatedOrder(i.OrderNumber).subscribe(
+        (cat: any) => {
+          this.allocatedOrder = cat;
+          console.log('Allocated Order', this.allocatedOrder);          
+        },
+        (err) => {
+          console.log(err);
+          this.spinner.hide();
+        }
+      );
     } else {
       this.Allocated = false;
     }
+
     this.FoldComments = i.FoldComments;
-//    if (i.FoldStore === 'NO SKU' || i.FoldStore === 'Multiple Stores') {
     this.spinner.show();
-    this.service.CTGetMultiOrders_Static(i.OrderNumber)
-        .subscribe((cat: any) => {
-          (this.MultiOrders = cat);
-       //   console.log(this.MultiOrders);
-          this.getStore();
-          this.spinner.hide();
-        },
-          (err) => {
-            console.log(err);
-            this.spinner.hide();
-          });
-  //  }
-    this.modalService
-      .open(comments, { ariaLabelledBy: 'modal-basic-title' })
-      .result.then(
-        result => {
-          this.closeResult = `Closed with: ${result}`;
-          this.MultiOrders = '';
-          this.Allocated = false;
-        },
-        reason => {
-          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-          this.MultiOrders = '';
-          this.Allocated = false;
-        }
-      );
+    this.service.CTGetMultiOrders_Static(i.OrderNumber).subscribe(
+      (cat: any) => {
+        this.MultiOrders = cat;
+        console.log('cat Start', cat);
+        console.log('Multi Start', this.MultiOrders);
+        this.getStore();
+        const temp = cat;
+        this.xx(temp);
+
+        console.log(this.MultiOrders)
+        this.modalService
+          .open(comments, { ariaLabelledBy: 'modal-basic-title' })
+          .result.then(
+            (result) => {
+              this.closeResult = `Closed with: ${result}`;
+              this.MultiOrders = '';
+              this.Allocated = false;
+            },
+            (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+              this.MultiOrders = '';
+              this.Allocated = false;
+            }
+          );
+
+
+
+        this.spinner.hide();
+      },
+      (err) => {
+        console.log(err);
+        this.spinner.hide();
+      }
+    );
+    
+    // console.log(this.MultiOrders)
+    // this.modalService
+    //   .open(comments, { ariaLabelledBy: 'modal-basic-title' })
+    //   .result.then(
+    //     (result) => {
+    //       this.closeResult = `Closed with: ${result}`;
+    //       this.MultiOrders = '';
+    //       this.Allocated = false;
+    //     },
+    //     (reason) => {
+    //       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    //       this.MultiOrders = '';
+    //       this.Allocated = false;
+    //     }
+    //   );
   }
 
   private getDismissReason(reason: any): string {
@@ -396,13 +505,16 @@ export class OrderMenuComponent implements OnInit {
   }
 
   getSplitTotals(store: string, sku: string) {
-    if (this.splitTotal.find(s => s.Store === store)) {
+    if (this.splitTotal.find((s) => s.Store === store)) {
       let i = 0;
       let stores = 0;
       for (i = 0, stores = this.splitTotal.length; i < stores; i++) {
         if (this.splitTotal[i].Store === store) {
           this.splitTotal[i].Items = +this.splitTotal[i].Items + 1;
-          this.splitTotal[i].SKUList = this.splitTotal[i].SKUList.concat(', ', sku);
+          this.splitTotal[i].SKUList = this.splitTotal[i].SKUList.concat(
+            ', ',
+            sku
+          );
         }
       }
     } else {
@@ -423,10 +535,10 @@ export class OrderMenuComponent implements OnInit {
     const stock = store.substring(0, 1);
     const n = store.indexOf('-') + 2;
     store = store.substring(n);
-    if (store === 'Not In Stock' || stock === '0' ) {
+    if (store === 'Not In Stock' || stock === '0') {
       store = 'REFUND';
     }
-    if (this.tempSplit.find(s => s.SKU === sku)) {
+    if (this.tempSplit.find((s) => s.SKU === sku)) {
       let i = 0;
       let stores = 0;
       for (i = 0, stores = this.tempSplit.length; i < stores; i++) {
@@ -450,30 +562,34 @@ export class OrderMenuComponent implements OnInit {
 
   onProdSelect(args) {
     if (args.target.value !== '9999' && !this.shipLOCK) {
-      this.StoreSplit(args.target.options[args.target.selectedIndex].text, args.target.value);
+      this.StoreSplit(
+        args.target.options[args.target.selectedIndex].text,
+        args.target.value
+      );
     }
   }
 
   getCurrent() {
     this.spinner.show();
-    this.service.CTGetMultiOrders(this.OrderNo)
-      .subscribe((cat: any) => {
-        (this.MultiOrders = cat);
+    this.service.CTGetMultiOrders(this.OrderNo).subscribe(
+      (cat: any) => {
+        this.MultiOrders = cat;
         this.getStore();
         this.spinner.hide();
       },
-        (err) => {
-          console.log(err);
-          this.spinner.hide();
-        });
+      (err) => {
+        console.log(err);
+        this.spinner.hide();
+      }
+    );
   }
 
   openVend() {
     this.spinner.show();
     let VendId: string;
-    this.service.CTGetVendID(this.OrderNo)
-      .subscribe((cat: any) => {
-        (VendId = cat);
+    this.service.CTGetVendID(this.OrderNo).subscribe(
+      (cat: any) => {
+        VendId = cat;
         this.spinner.hide();
         console.log(VendId);
         let orderAddress = 'https://thefold.vendhq.com/history#';
@@ -481,12 +597,12 @@ export class OrderMenuComponent implements OnInit {
         window.open(orderAddress, '_blank');
         //    https://thefold.vendhq.com/history#59423c0f-8e53-b7a4-11ea-94a123b534f8
       },
-        (err) => {
-          console.log(err);
-          this.spinner.hide();
-        });
+      (err) => {
+        console.log(err);
+        this.spinner.hide();
+      }
+    );
   }
-
 
   testSingle(targetStore: string) {
     // Get the current Order
@@ -494,14 +610,14 @@ export class OrderMenuComponent implements OnInit {
     // Total table has the products by Store
     // Grab the firts store
     // Loop through the Order and remove Products that is not linked to the specific store
-  //  targetStore = 'Brooklyn';
-  this.spinner.show();
-  this.Allocated = false;
-  let i = 0;
-  let stores = 0;
-  this.service.CTGetVendOrder(this.OrderNo)
-      .subscribe((cat: any) => {
-      //  return;
+    //  targetStore = 'Brooklyn';
+    this.spinner.show();
+    this.Allocated = false;
+    let i = 0;
+    let stores = 0;
+    this.service.CTGetVendOrder(this.OrderNo).subscribe(
+      (cat: any) => {
+        //  return;
         this.VendMaster = cat;
         this.VendProducts = this.VendMaster.register_sale_products;
         let currentRegister: string;
@@ -526,16 +642,20 @@ export class OrderMenuComponent implements OnInit {
             this.splitTotal[n].orderCost = this.orderCost;
             this.splitTotal[n].orderPrice = this.orderPrice;
             this.splitTotal[n].orderTax = this.orderTax;
-            this.splitTotal[n].SKUList = this.splitTotal[n].SKUList.concat(', ', 'FreeStandardShippingPromo');
+            this.splitTotal[n].SKUList = this.splitTotal[n].SKUList.concat(
+              ', ',
+              'FreeStandardShippingPromo'
+            );
           }
         }
         this.checkForPost();
         this.spinner.hide();
       },
-        (err) => {
-          console.log(err);
-          this.spinner.hide();
-        });
+      (err) => {
+        console.log(err);
+        this.spinner.hide();
+      }
+    );
   }
 
   splitOrder(register: string, prods: any) {
@@ -552,8 +672,7 @@ export class OrderMenuComponent implements OnInit {
         this.orderPrice = this.orderPrice + products[n].price_total;
         this.orderTax = this.orderTax + products[n].tax_total;
       } else {
-        this.VendTemp.register_sale_products.splice(n, 1, {
-        });
+        this.VendTemp.register_sale_products.splice(n, 1, {});
       }
     }
     switch (register) {
@@ -587,8 +706,8 @@ export class OrderMenuComponent implements OnInit {
         // this.VendTemp.user_name = 'WEB B';
         break;
       }
-   }
-   // this.VendTemp.id = '';
+    }
+    // this.VendTemp.id = '';
     this.VendTemp.register_sale_payments[0].amount = this.orderPrice;
     this.VendTemp.total_cost = this.orderCost;
     this.VendTemp.total_price = this.orderPrice;
@@ -615,37 +734,40 @@ export class OrderMenuComponent implements OnInit {
     for (let n = 0; n < this.splitTotal.length; n++) {
       this.VendMaster.note = 'Order_Test_Shopify';
     }
-  //  console.log(this.splitTotal);
-    this.service.CTUpdateVendOrder(this.OrderNo, this.splitTotal)
-      .subscribe((cat: any) => {
+    console.log(this.OrderNo, this.splitTotal);
+    this.service.CTUpdateVendOrder(this.OrderNo, this.splitTotal).subscribe(
+      (cat: any) => {
         this.refresh();
         this.spinner.hide();
       },
-        (err) => {
-          console.log(err);
-          this.spinner.hide();
-        });
+      (err) => {
+        console.log(err);
+        this.spinner.hide();
+      }
+    );
   }
 
   refresh() {
     this.spinner.show();
-    this.service.getorders()
-    .subscribe((cat: any[]) => {
-      this.service.SPGetOrders()
-        .subscribe((cat: IShopOrders[]) => {
-          (this.orderList = cat);
-          this.filteredText = this.orderList;
-          this.preFilter();
-          this.spinner.hide();
-        },
+    this.service.getorders().subscribe(
+      (cat: any[]) => {
+        this.service.SPGetOrders().subscribe(
+          (cat: IShopOrders[]) => {
+            this.orderList = cat;
+            this.filteredText = this.orderList;
+            this.preFilter();
+            this.spinner.hide();
+          },
           (err) => {
             console.log(err);
             this.spinner.hide();
-          });
-    },
+          }
+        );
+      },
       (err) => {
         console.log('##### ERROR', err);
         this.spinner.hide();
-      });
+      }
+    );
   }
 }

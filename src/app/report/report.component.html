@@ -52,8 +52,8 @@
     </div>
   </div>
 
-  <div class='row fontBlack' style='padding-top: 5px; text-align: center;'>
-    <div class='col-sm-4 center'></div>
+  <div class='row fontBlack' style='padding-top: 5px; text-align: center; border-bottom: lightslategray solid 1px;'>
+    <div class='col-sm-3 center'></div>
     <div class='col-sm-2 center'>
       <label class='bu' style='margin-bottom: 0px;'>
         View month:
@@ -63,41 +63,68 @@
         <option *ngFor="let s of dateDD" [value]="s.id">{{ s.display}}</option>
       </select>
     </div>
-    <!-- <div class='col-sm-3'>
-      <label class='bu' style='margin-bottom: 0px;'>
-        From Date:
-      </label>
-      <div class="input-group">
-        <input class="form-control" placeholder="dd-mm-yyyy" name="dpFrom" [(ngModel)]="dateFrom" ngbDatepicker
-          #dpFrom="ngbDatepicker" (closed)="preFilter()">
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" (click)="dpFrom.toggle(); getDateData()" type="button">📅</button>
-        </div>
-      </div>
-    </div>
-    <div class='col-sm-3'>
-      <label class='bu' style='margin-bottom: 0px;'>
-        To Date:
-      </label>
-      <div class="input-group">
-        <input class="form-control" placeholder="dd-mm-yyyy" name="dpTo" [(ngModel)]="dateTo" ngbDatepicker
-          #dpTo="ngbDatepicker" (closed)="preFilter()">
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" (click)="dpTo.toggle(); getDateData()" type="button">📅</button>
-        </div>
-      </div>
-    </div> -->
-
-
+    <div class='col-sm-2 center'>
+      <h2 *ngIf="this.filteredOut">{{ displayFrom }} - <br>{{ displayTo }} </h2></div>
     <div class='col-sm-2'><label class='bu' style='margin-bottom: 0px;'>
       Clear Filters:
     </label><br>
     <button type="button" class="btn btn-sm btn-info" (click)="resetFilters()">Clear All Filters</button>
   </div>
-  <div class='col-sm-4 center'></div>
+  <div class='col-sm-3 center'></div>
   </div>
-
-
+  <div>
+    <h2 class="fontBlack center"><u>Outstanding Cost</u></h2>
+    <table *ngIf="this.filteredOut" class="table table-bordered table-responsive-sm w-auto table-condensed table-striped black" style='font-size: 1em; width: 100%; background-color: lightcoral; margin: auto;'>
+      <thead class="table-primary">
+        <tr>
+          <th (click)="sort('OrderDate')">Date</th>
+          <th (click)="sort('FoldStore')">Register</th>
+          <th (click)="sort('OrderId')">Order No</th>
+          <th (click)="sort('VendCost')">Vend Total</th>
+          <th (click)="sort('Shopify30')">Shopify Fees</th>
+          <th (click)="sort('Paypal')">Paypal Fees</th>
+          <th (click)="sort('ShippingCost')">Shipping Fees</th>
+          <th (click)="sort('TotalDue')">Total Due</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pakOut of this.filteredOut; let i = index" [attr.data-index]="i" [attr.data-id]="pakOut.FoldId" [ngClass]="(pakOut.OrderDate ==='Total')?'bold':'fontBlack'">
+          <td>
+              <span *ngIf='pakOut.FoldStore !=="xTotal"' style="text-align: left;">{{ pakOut.OrderDate }}</span>
+              <span *ngIf='pakOut.FoldStore ==="xTotal"'style="text-align: left;">GROUP TOTAL</span>
+          </td>
+          <td>
+            <span *ngIf='pakOut.FoldStore !=="xTotal"' style="text-align: left;">{{ pakOut.FoldStore }}</span>
+        </td>
+          <td>
+            <span *ngIf='pakOut.OrderDate !== "Total"'>#{{ pakOut.OrderId }}</span>
+            <span *ngIf='pakOut.OrderDate === "Total"' style="font-weight: bold;">Total: {{ pakOut.OrderId }}</span>
+          </td>
+          <td>
+            <span>${{ pakOut.VendCost }}</span>
+          </td>
+          <td>
+            <span>${{ pakOut.Shopify30 | number:'0.0-2' }}</span>
+          </td>
+          <td>
+              <span>${{ pakOut.Paypal }}</span>
+          </td>
+          <td>
+              <span>${{ pakOut.ShippingCost }}</span>
+          </td>
+          <td>
+            <span>${{ pakOut.TotalDue }}</span>
+          </td>
+        </tr>
+        <tr *ngIf='!filteredOut'>
+          <td colspan='10'>
+            <span>No Outstanding Cost</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div><hr>
+  <h2 class="fontBlack center"><u>Cost Added</u></h2>
   <table class="table table-bordered table-responsive-sm w-auto table-condensed table-striped black" style='font-size: 1em; width: 100%; background-color: lightgray; margin: auto;'>
     <thead class="table-primary">
       <tr>
@@ -123,7 +150,7 @@
       </td>
         <td>
           <span *ngIf='pak.OrderDate !== "Total"'>#{{ pak.OrderId }}</span>
-          <span *ngIf='pak.OrderDate === "Total"' style="font-weight: bold;">Total:</span>
+          <span *ngIf='pak.OrderDate === "Total"' style="font-weight: bold;">Total: {{ pak.OrderId }}</span>
         </td>
         <td>
           <span>${{ pak.VendCost }}</span>
@@ -132,28 +159,14 @@
           <span>${{ pak.Shopify30 | number:'0.0-2' }}</span>
         </td>
         <td>
-          <input type="text" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldPaypal"
-              class="form-control" style="margin-bottom: 0px; border-radius: 5px; max-width: 100px; " />
             <span *ngIf="!pak.editing">${{ pak.Paypal }}</span>
         </td>
         <td>
-          <input type="text" *ngIf="pak.editing && oldReport" [(ngModel)]="oldReport.FoldShippingCost"
-              class="form-control" style="margin-bottom: 0px; border-radius: 5px; max-width: 100px; " />
             <span *ngIf="!pak.editing">${{ pak.ShippingCost }}</span>
         </td>
         <td>
           <span>${{ pak.TotalDue }}</span>
         </td>
-        <!-- <td>
-          <div *ngIf='pak.OrderDate !== "Total"' class="btn-group btn-group-sm" role="group" style="width: 100%">
-            <button class="btn btn-success btn-sm" *ngIf="pak.editing"
-            (click)="updateFold();pak.editing=false">Update</button>
-          <button class="btn btn-info btn-sm" *ngIf="!pak.editing"
-            (click)="pak.editing=true; getFold(pak.FoldId);">Edit</button>
-            <button class="btn btn-secondary btn-sm" *ngIf="pak.editing"
-            (click)="pak.editing=false">Cancel</button>
-        </div>
-        </td> -->
       </tr>
       <tr *ngIf='!filteredText'>
         <td colspan='10'>
