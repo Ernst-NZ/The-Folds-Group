@@ -89,7 +89,7 @@
             <button *ngIf='!pak.FoldStatus && (pak.FoldStore === "NO SKU" || pak.FoldStore === "Multiple Stores" )'
               class="btn btn-danger btn-small btn-block" (click)="getOrder(pak.OrderId)"
               style='text-align: left;'>#{{ pak.OrderNumber }}</button>
-            <button *ngIf='pak.FoldStatus === "VOIDED" || pak.FoldStatus === "CLOSED"' class="btn btn-success btn-small btn-block"
+            <button *ngIf='pak.FoldStatus === "VOIDED" || pak.FoldStatus === "CLOSED" || pak.FoldStatus === "DISPATCHED_CLOSED" ' class="btn btn-success btn-small btn-block"
               (click)="getOrder(pak.OrderId)" style='text-align: left;'>#{{ pak.OrderNumber }}</button>
           </td>
           <td>
@@ -213,7 +213,7 @@
         <span style="text-align: center;" [innerHTML]="FoldComments"></span>
       </td>
       </tr>
-      <tr *ngIf='!this.Allocated'>
+      <tr *ngIf='!this.Allocated || globals.FirstName === "Ernst"'>
         <td colspan="4" style="text-align: center;">
           <button *ngIf='this.tempSplit.length === OrderItemTotal && ReadyForPost' class="btn btn-success btn-small"
               (click)="splitOrders(); modal.dismiss()" style='text-align: center;'>Process Orders</button>

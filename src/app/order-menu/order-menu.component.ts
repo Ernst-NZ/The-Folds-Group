@@ -102,6 +102,7 @@ export class OrderMenuComponent implements OnInit {
       (cat: IShopOrders[]) => {
         this.orderList = cat;
         this.filteredText = this.orderList;
+        // console.log(this.orderList);
         this.spinner.hide();
       },
       (err) => {
@@ -330,7 +331,7 @@ export class OrderMenuComponent implements OnInit {
   }
 
   async filterPromise(): Promise<void> {
-    console.log('start filter');
+  //  console.log('start filter');
     this.filteredText = this.orderList;
     // console.log(this.filteredText);
 
@@ -362,7 +363,7 @@ export class OrderMenuComponent implements OnInit {
   }
 
   getOrder(orderid: string) {
-    console.log(orderid);
+//    console.log(orderid);
     let orderAddress = 'https://thefoldgroup.myshopify.com/admin/orders/';
     orderAddress = orderAddress.concat(orderid);
     window.open(orderAddress, '_blank');
@@ -371,20 +372,20 @@ export class OrderMenuComponent implements OnInit {
   xx(tempList: any) {
     if (this.Allocated) {
       for (let n = 0; n < tempList.length; n++) {
-        console.log('tempList', tempList);
-        console.log(n, tempList[n]['ItemSKU']);
+      //  console.log('tempList', tempList);
+      //  console.log(n, tempList[n]['ItemSKU']);
         let xx = this.allocatedOrder.find(
           (record) => record.FoldItemSKU === tempList[n]['ItemSKU']
         );
         if (xx) {
-          console.log(xx['FoldStore']);
+    //      console.log(xx['FoldStore']);
           if (xx['FoldStore'] !== this.allocatedStore) {
-            console.log('remove line ', n, tempList[n]['ItemSKU']);
+    //        console.log('remove line ', n, tempList[n]['ItemSKU']);
             // this.MultiOrders.splice(n, 1);           
             //  tempList.splice(n, 1);
 
           } else {
-            console.log('Store is the same', n, tempList[n]['ItemSKU']);
+    //        console.log('Store is the same', n, tempList[n]['ItemSKU']);
             this.newSplit.push({
               Store: tempList[n]['Store'],
               ItemId: tempList[n]['ItemId'],
@@ -395,10 +396,10 @@ export class OrderMenuComponent implements OnInit {
               Howard: tempList[n]['Howard'],
               West: tempList[n]['West'],
             });
-            console.log('PUSH',n, this.newSplit);
+     //       console.log('PUSH',n, this.newSplit);
           }
         } else {
-          console.log('Item not found', n, tempList['ItemSKU']);
+ //         console.log('Item not found', n, tempList['ItemSKU']);
         }
       }
       this.MultiOrders =  this.newSplit;
@@ -477,7 +478,7 @@ export class OrderMenuComponent implements OnInit {
       }
     );
     
-    // console.log(this.MultiOrders)
+     console.log(this.MultiOrders)
     // this.modalService
     //   .open(comments, { ariaLabelledBy: 'modal-basic-title' })
     //   .result.then(
@@ -561,7 +562,7 @@ export class OrderMenuComponent implements OnInit {
   }
 
   onProdSelect(args) {
-    if (args.target.value !== '9999' && !this.shipLOCK) {
+    if (args.target.value !== '9999' && (!this.shipLOCK || this.globals.FirstName === "Ernst")) {
       this.StoreSplit(
         args.target.options[args.target.selectedIndex].text,
         args.target.value
@@ -592,8 +593,9 @@ export class OrderMenuComponent implements OnInit {
         VendId = cat;
         this.spinner.hide();
         console.log(VendId);
-        let orderAddress = 'https://thefold.vendhq.com/history#';
-        orderAddress = orderAddress.concat(VendId);
+        let orderAddress = 'https://thefold.vendhq.com/history?date_from_offset=-780&&date_to_offset=-780&receipt_number=';
+//        orderAddress = orderAddress.concat(VendId);
+        orderAddress = orderAddress.concat(this.OrderNo);
         window.open(orderAddress, '_blank');
         //    https://thefold.vendhq.com/history#59423c0f-8e53-b7a4-11ea-94a123b534f8
       },
@@ -734,7 +736,7 @@ export class OrderMenuComponent implements OnInit {
     for (let n = 0; n < this.splitTotal.length; n++) {
       this.VendMaster.note = 'Order_Test_Shopify';
     }
-    console.log(this.OrderNo, this.splitTotal);
+ //   console.log(this.OrderNo, this.splitTotal);
     this.service.CTUpdateVendOrder(this.OrderNo, this.splitTotal).subscribe(
       (cat: any) => {
         this.refresh();

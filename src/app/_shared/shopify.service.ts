@@ -26,30 +26,28 @@ export class ShopifyService {
  }
 
   getTotal(): Observable<any> {
-    console.log('Get Total Service');
     return this.http.get<any>(this.rootURL + '/ShopifyTotal/');
   }
 
-  getTest(endPoint: string): Observable<any> {
-    return this.http.get<any>(this.rootURL + '/shopOrders/');
-  }
-
+  
   getorders(): Observable<any> {
-    console.log('Get Total Service');
-    return this.http.get<any>(this.rootURL + '/ShopifyGetOrder');
+//    return this.http.get<any>(this.rootURL + '/ShopifyGetOrder');
+    return this.http.get<any>(this.rootURL + '/Ezy_ShopifyGetOrder');
   }
 
   SPGetOrders(): Observable<any> {
-    console.log('Get Total Service');
+ //   console.log('Get Total Service');
     return this.http.get<any>(this.rootURL + '/SPGetOrders/');
   }
 
   CTGetMultiOrders(OrderNo: string): Observable<any> {
-    return this.http.get<any>(this.rootURL + '/MultiStore/' + OrderNo);
+//    return this.http.get<any>(this.rootURL + '/MultiStore/' + OrderNo);
+    return this.http.get<any>(this.rootURL + '/Ezy_MultiStores/' + OrderNo);
   }
 
   CTGetMultiOrders_Static(OrderNo: string): Observable<any> {
-    return this.http.get<any>(this.rootURL + '/MultiStore_Static/' + OrderNo);
+//    return this.http.get<any>(this.rootURL + '/MultiStore_Static/' + OrderNo);
+    return this.http.get<any>(this.rootURL + '/Ezy_MultiStore_Static/' + OrderNo);
   }
 
   SPGetAllocatedOrder(OrderNo: string): Observable<any> {
@@ -61,15 +59,16 @@ export class ShopifyService {
   }
 
   CTGetVendOrder(OrderID: string): Observable<string> {
-    return this.http.get<string>(this.rootURL + '/GetVendOrder/' + OrderID);
+//    return this.http.get<string>(this.rootURL + '/GetVendOrder/' + OrderID);
+    return this.http.get<string>(this.rootURL + '/Ezy_VendOrder/' + OrderID);
   }
 
   CTUpdateVendOrder(orderNo: string, splitTotal: any) {
-    return this.http.put(this.rootURL + '/VendUpdates/' + orderNo, splitTotal);
+    return this.http.put(this.rootURL + '/Ezy_VendOrder/' + orderNo, splitTotal);
   }
 
   CTVendTest(orderNO: string, splitTotal: any) {
-    console.log('#####################################')
+ //   console.log('#####################################')
     return this.http.put(this.rootURL + '/VendTest/' + orderNO,   splitTotal);
   }
 
@@ -91,7 +90,7 @@ export class ShopifyService {
 
    // Edit one
    putFolds(editFold: any) {
-    console.log(editFold);
+ //   console.log(editFold);
     return this.http.put(this.rootURL + '/Folds/' + editFold.FoldId, editFold );
   }
 
@@ -100,7 +99,7 @@ export class ShopifyService {
   }
 
   testPut(orderNo: string,  editFold: any) {
-    console.log('xxxxxxxxxxxxx', editFold);
+ //   console.log('xxxxxxxxxxxxx', editFold);
     return this.http.put(this.rootURL + '/VendTest/' + orderNo,   editFold);
   }
 }

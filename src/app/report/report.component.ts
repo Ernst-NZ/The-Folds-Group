@@ -78,19 +78,23 @@ export class ReportComponent implements OnInit {
   //  console.log('pre data', this.dateFrom, this.dateTo);
     this.spinner.show();
     await this.delay(1000);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun','Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];      
+
     this.filterDate = [];
     this.report = [];
     this.outstanding = [];
-    let tempFrom = this.dateFrom.month.toString();
-    tempFrom = tempFrom.concat('/', this.dateFrom.day.toString(), '/', this.dateFrom.year.toString());
-    let tempTo = this.dateTo.month.toString();
-    tempTo = tempTo.concat('/', this.dateTo.day.toString(), '/', this.dateTo.year.toString());
+    console.log("###################", this.dateFrom.month)
+    let tempFrom = monthNames[this.dateFrom.month];; // this.dateFrom.month.toString();
+    tempFrom = this.dateFrom.day.toString() + " " +  tempFrom + " '" + this.dateFrom.year.toString().substring(2);
+    let tempTo = monthNames[+this.dateTo.month-1];;
+    tempTo = this.dateTo.day.toString() + " " +  tempTo + " '" + this.dateTo.year.toString().substring(2);
     this.filterDate.push({
       fromDate: tempFrom,
       toDate: tempTo,
     });
     this.displayFrom = tempFrom;
     this.displayTo = tempTo;
+    console.log(this.displayFrom, this.displayTo)
     this.service.SPGetCostReport(this.filterDate)
     .subscribe((cat: ICostReport[]) => {
       (this.report = cat);
@@ -136,14 +140,19 @@ export class ReportComponent implements OnInit {
     this.spinner.show();
     this.filterDate = [];
     const lastDay = function(y , m) {
-      return  new Date(y, m + 1, 0).getDate();
+      console.log("###### Last Day m", m)
+      return  new Date(y, m , 0).getDate();
       };
     let i = null;
     i = args.target.value;
     let endOfMonth = 1;
     this.dateFrom = this.dateDD[i].value;
-    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month - 1);
-    this.dateTo = { year: +this.dateFrom.year, month: +this.dateFrom.month , day: +endOfMonth };
+    endOfMonth = lastDay(+this.dateFrom.year, +this.dateFrom.month + 1);
+    this.dateTo = { year: +this.dateFrom.year, month: +this.dateFrom.month +1 , day: +endOfMonth };
+
+    console.log("################",this.dateTo, endOfMonth)
+
+
     this.getDateData();
   }
 
@@ -186,8 +195,9 @@ export class ReportComponent implements OnInit {
     const tempMonth = new Date(date).getMonth().toString();
     const tempDay = new Date(date).getDate().toString();
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                     'July', 'August', 'September', 'October', 'November', 'December'];
-    const tempMonthName = monthNames[date.getMonth() - 1 ];
+                     'July', 'August', 'September', 'October', 'November', 'December'];                     
+    const tempMonthName = monthNames[date.getMonth() ];
+    console.log(date.getMonth(),tempMonthName)
     this.dateDD.push({
       value: { year: +tempYear, month: +tempMonth, day: +tempDay },
       display: tempMonthName.concat(' - ' , tempYear),
@@ -196,12 +206,22 @@ export class ReportComponent implements OnInit {
   }
 
   buildDropDown() {
-    let zeroDate = new Date('04-01-2020');
-    const nowDate = new Date();
+    let zeroDate = new Date('04-01-2020').getTime();
+    let tempDate = new Date('04-01-2020');
+    const nowDate = new Date().getTime();
     let i = 0;
     while (zeroDate < nowDate) {
-      zeroDate = new Date(zeroDate.setMonth(zeroDate.getMonth() + 1));
-      this.formatDates(zeroDate, i);
+      
+      if (tempDate.getMonth() < 11) {
+        tempDate = new Date(tempDate.setMonth(tempDate.getMonth() + 1));
+      } else {
+        tempDate = new Date(tempDate.setFullYear(tempDate.getFullYear() + 1));
+        tempDate = new Date(tempDate.setMonth(0));
+      }
+      console.log(tempDate, tempDate.getMonth())
+      this.formatDates(tempDate, i);
+      zeroDate = new Date(tempDate).getTime();
+      
       i++;
     }
   }
